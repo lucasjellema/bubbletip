@@ -10,11 +10,13 @@ import { setupLayouts } from 'virtual:generated-layouts'
 import { routes } from 'vue-router/auto-routes'
 import newtip from '@/pages/newtip.vue';
 import map from '@/pages/map.vue';
+import index from '@/pages/index.vue';
 
 const createRoutes = () => {
 //  const r = setupLayouts(routes)
   const r = []
   console.log(r)
+  r.push({ path: '/',name: 'intro', component: index })
   r.push({ path: '/newtip',name: 'newtip', component: newtip })
   r.push({ path: '/map',name: 'map', component: map })
   return r
