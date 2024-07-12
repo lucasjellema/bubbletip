@@ -5,21 +5,24 @@
  */
 
 // Composables
-import { createRouter, createWebHistory } from 'vue-router/auto'
+import { createRouter, createWebHashHistory  } from 'vue-router'
 import { setupLayouts } from 'virtual:generated-layouts'
 import { routes } from 'vue-router/auto-routes'
 import newtip from '@/pages/newtip.vue';
+import map from '@/pages/map.vue';
 
-const createRoutes = (routes) => {
-  const r = setupLayouts(routes)
+const createRoutes = () => {
+//  const r = setupLayouts(routes)
+  const r = []
   console.log(r)
   r.push({ path: '/newtip',name: 'newtip', component: newtip })
+  r.push({ path: '/map',name: 'map', component: map })
   return r
 }
 
 const router = createRouter({
-  history: createWebHistory(import.meta.env.BASE_URL),
-  routes: createRoutes(routes),
+  history: createWebHashHistory(import.meta.env.BASE_URL),
+  routes: createRoutes(),
 })
 
 // Workaround for https://github.com/vitejs/vite/issues/11804
