@@ -8,10 +8,18 @@
 import { createRouter, createWebHistory } from 'vue-router/auto'
 import { setupLayouts } from 'virtual:generated-layouts'
 import { routes } from 'vue-router/auto-routes'
+import newtip from '@/pages/newtip.vue';
+
+const createRoutes = (routes) => {
+  const r = setupLayouts(routes)
+  console.log(r)
+  r.push({ path: '/newtip',name: 'newtip', component: newtip })
+  return r
+}
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
-  routes: setupLayouts(routes),
+  routes: createRoutes(routes),
 })
 
 // Workaround for https://github.com/vitejs/vite/issues/11804
