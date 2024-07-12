@@ -22,7 +22,7 @@ De tips in deze applicatie zijn alleen beschikbaar voor de persoonlijk uitgenodi
                                     </p>
                                 </v-col>
                                 <v-col cols="6">
-                                    <v-img src="@/assets/anne-was-hier.png" ></v-img>
+                                    <v-img :src="logo" ></v-img>
                                 </v-col>
                             </v-row>
                         </v-container>
@@ -64,6 +64,6 @@ De tips in deze applicatie zijn alleen beschikbaar voor de persoonlijk uitgenodi
 
 
 <script setup>
-
+import logo from './assets/anne-was-hier.png'
 
 </script>
