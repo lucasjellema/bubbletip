@@ -10,15 +10,23 @@ import { setupLayouts } from 'virtual:generated-layouts'
 import { routes } from 'vue-router/auto-routes'
 import newtip from '@/pages/newtip.vue';
 import map from '@/pages/map.vue';
+import request from '@/pages/request.vue';
+import members from '@/pages/members.vue';
+import browse from '@/pages/browse.vue';
+import recent from '@/pages/recent.vue';
 import index from '@/pages/index.vue';
 
 const createRoutes = () => {
 //  const r = setupLayouts(routes)
   const r = []
-  console.log(r)
+  
   r.push({ path: '/',name: 'intro', component: index })
   r.push({ path: '/newtip',name: 'newtip', component: newtip })
   r.push({ path: '/map',name: 'map', component: map })
+  r.push({ path: '/request',name: 'request', component: request })
+  r.push({ path: '/members',name: 'members', component: members })
+  r.push({ path: '/browse',name: 'browse', component: browse })
+  r.push({ path: '/recent',name: 'recent', component: recent })
   return r
 }
 
