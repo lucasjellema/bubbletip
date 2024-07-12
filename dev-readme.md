@@ -68,3 +68,4 @@ npm run deploy
 ```
 The first time this deployment is ran, a new branch is created - called `gh-pages` - and the GitHub project is configured for GitHub Pages, including GitHub actions for do the actual deployment. 
 
+To resolve errors "Dynamic import error, reloading page did not fix it TypeError: Failed to fetch dynamically imported module" I have removed the dynamic route creation and replaced it with static route definitions. 
