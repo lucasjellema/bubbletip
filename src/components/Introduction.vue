@@ -64,6 +64,6 @@ De tips in deze applicatie zijn alleen beschikbaar voor de persoonlijk uitgenodi
 
 
 <script setup>
-import logo from './assets/anne-was-hier.png'
+import logo from '@/assets/anne-was-hier.png'
 
 </script>
