@@ -18,8 +18,8 @@ export const useAppStore = defineStore('app', () => {
           if (!response.ok) {
             throw new Error('Network response was not ok ' + response.statusText);
           }
-          resolve(response.json())          
-        })        
+          resolve(response.json())
+        })
         .catch(err =>
           resolve(1)
         );
@@ -87,10 +87,19 @@ export const useAppStore = defineStore('app', () => {
     return bubbleJSON
   }
 
-  const saveLid= (gebruikersnaam, voornaam, achternaam, geboortedatum, introductie) => {
-    const lidSequence = bubbleJSON.value.leden.push({ gebruikersnaam: gebruikersnaam, voornaam: voornaam, achternaam: achternaam, geboortedatum: geboortedatum, introductie: introductie }) 
+  const saveLid = (gebruikersnaam, voornaam, achternaam, geboortedatum, introductie) => {
+    let lid = bubbleJSON.value.leden.find(lid => lid.gebruikersnaam === gebruikersnaam)
+    if (lid) {
+      lid.voornaam = voornaam
+      lid.achternaam = achternaam
+      lid.geboortedatum = geboortedatum
+      lid.introductie = introductie
+    } else {
+      const lidSequence = bubbleJSON.value.leden.push({ gebruikersnaam: gebruikersnaam, voornaam: voornaam, achternaam: achternaam, geboortedatum: geboortedatum, introductie: introductie })
+      lid = bubbleJSON.value.leden[lidSequence - 1]
+    }
     bubbleChanged()
-    return bubbleJSON.value.leden[lidSequence - 1]
+    return lid
   }
 
   return {
