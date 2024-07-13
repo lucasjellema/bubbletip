@@ -20,6 +20,14 @@
                                         <br />
                                         De tips in deze applicatie zijn alleen beschikbaar voor de persoonlijk
                                         uitgenodigde leden van de tip-bubbel.
+                                        <br />
+                                        <br />
+                                        <p class="text-caption" style="color: red">Deze applicatie is nog in ontwikkeling. Je kunt tegen fouten aanlopen. Ook is het mogelijk dat tips, ikookjes en foto's die je hebt toegevoegd kwijtraken. Uiteraard probeer ik dat zoveel mogelijk te beperken. 
+                                            
+                                            Als je tegen problemen aanloopt, zou je die willen melden? Ook als je verbetersuggesties hebt voor de applicatie hoor ik dat heel graag. Je kunt dat doen via 
+                                            <v-btn  prepend-icon="mdi-account-box-edit-outline" text to="/incident" >Meld Incident</v-btn>
+            .
+                                        </p>
                                     </p>
                                 </v-col>
                                 <v-col cols="6">
@@ -67,4 +75,9 @@
 import logo from '@/assets/anne-was-hier.png'
 import { useAppStore } from "@/stores/app";
 const appStore = useAppStore()
+
+const createIncident = () => {
+ console.log('create incident')
+ //todo navigation to incident creation page
+}
 </script>

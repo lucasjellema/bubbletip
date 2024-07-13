@@ -18,6 +18,7 @@ import index from '@/pages/index.vue';
 import checkin from '@/pages/checkin.vue';
 import profile from '@/pages/profile.vue';
 import tip from '@/pages/tip.vue';
+import incident from '@/pages/incident.vue';
 
 const createRoutes = () => {
 //  const r = setupLayouts(routes)
@@ -33,6 +34,7 @@ const createRoutes = () => {
   r.push({ path: '/checkin',name: 'checkin', component: checkin })
   r.push({ path: '/profile/:gebruikersnaam',name: 'profile', component: profile })
   r.push({ path: '/tip/:tipId',name: 'tip', component: tip })
+  r.push({ path: '/incident',name: 'incident', component: incident })
   return r
 }
 

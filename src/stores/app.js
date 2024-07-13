@@ -108,12 +108,12 @@ export const useAppStore = defineStore('app', () => {
         bubbleJSON.value.tips[index] = tip
       } else {
         // weird: id is set but tip is not found. TODO error
-      } 
-    } else {
-        tip.id = new Date().getTime()
-        bubbleJSON.value.tips.push(tip)
       }
-    
+    } else {
+      tip.id = new Date().getTime()
+      bubbleJSON.value.tips.push(tip)
+    }
+
     bubbleChanged()
   }
 
@@ -121,18 +121,27 @@ export const useAppStore = defineStore('app', () => {
     const recent = []
     // create entries for members
     for (const lid of bubbleJSON.value.leden) {
-      recent.push({ type: 'lid', label: lid.gebruikersnaam, datum: lid.aanmaakdatum , details: lid.voornaam + ' ' + lid.achternaam, id: lid.gebruikersnaam}) 
+      recent.push({ type: 'lid', label: lid.gebruikersnaam, datum: lid.aanmaakdatum, details: lid.voornaam + ' ' + lid.achternaam, id: lid.gebruikersnaam })
     }
     // create entries for tips
     for (const tip of bubbleJSON.value.tips) {
-      recent.push({ type: 'tip', label: tip.naam, datum: tip.aanmaakdatum, details: tip.tipType + ' ' + tip.adresgegevens, id: tip.id})
+      recent.push({ type: 'tip', label: tip.naam, datum: tip.aanmaakdatum, details: tip.tipType + ' ' + tip.adresgegevens, id: tip.id })
     }
     // TODO gevraagde tips, ikookjes
-     
+
     return recent.sort((a, b) => a.datum - b.datum)
   }
 
+
+  const saveIncident = (incident) => {    
+    if (bubbleJSON.value.incidenten == null) {
+      bubbleJSON.value.incidenten = []
+    }
+    bubbleJSON.value.incidenten.push(incident)
+    bubbleChanged()
+  }
+
   return {
-    setPAR, getBubble, ingechecktLid, saveLid, saveTip, getRecent
+    setPAR, getBubble, ingechecktLid, saveLid, saveTip, getRecent, saveIncident
   }
 })
