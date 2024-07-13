@@ -3,12 +3,14 @@ import { defineStore } from 'pinia'
 
 export const useAppStore = defineStore('app', () => {
   const preAuthenticatedRequestURL = ref(null)
+  const ingechecktLid = ref(null)
   const setPAR = (par) => {
     preAuthenticatedRequestURL.value = par
     initializeBubble()
   }
 
-  const getFile = (filename) => {
+
+  const getJSONFile = (filename) => {
     return new Promise((resolve, reject) => {
       const targetURL = preAuthenticatedRequestURL.value + filename
       fetch(targetURL, { method: 'GET' })
@@ -16,11 +18,8 @@ export const useAppStore = defineStore('app', () => {
           if (!response.ok) {
             throw new Error('Network response was not ok ' + response.statusText);
           }
-          return response.blob;
-        })
-        .then(blob => {
-          resolve(JSON.parse(blob));
-        })
+          resolve(response.json())          
+        })        
         .catch(err =>
           resolve(1)
         );
@@ -50,9 +49,26 @@ export const useAppStore = defineStore('app', () => {
   }
 
   const bubbleJSON = ref(null)
+  const bubbleHasChanged = ref(false)
+  watch(bubbleJSON, () => {
+    console.log(`#### bubble has changed`)
+    bubbleHasChanged.value = true
+  })
+
+  const bubbleChanged = () => {
+    bubbleHasChanged.value = true
+  }
+
+  const periodicBubbleSaver = () => setInterval(() => {
+    if (bubbleHasChanged.value) {
+      saveFile(JSON.stringify(bubbleJSON.value), 'bubble.json')
+      bubbleHasChanged.value = false
+    }
+  }, 5000)
+
   const initializeBubble = async () => {
     // read bubble.json from par
-    bubbleJSON.value = await getFile('bubble.json')
+    bubbleJSON.value = await getJSONFile('bubble.json')
     console.log(bubbleJSON.value)
     // if not found, create it
     if (bubbleJSON.value == 1) {
@@ -63,6 +79,7 @@ export const useAppStore = defineStore('app', () => {
       saveFile(JSON.stringify(bubbleJSON.value), 'bubble.json')
 
     }
+    periodicBubbleSaver()
     return bubbleJSON
   }
 
@@ -70,7 +87,13 @@ export const useAppStore = defineStore('app', () => {
     return bubbleJSON
   }
 
+  const saveLid= (gebruikersnaam, voornaam, achternaam, geboortedatum, introductie) => {
+    const lidSequence = bubbleJSON.value.leden.push({ gebruikersnaam: gebruikersnaam, voornaam: voornaam, achternaam: achternaam, geboortedatum: geboortedatum, introductie: introductie }) 
+    bubbleChanged()
+    return bubbleJSON.value.leden[lidSequence - 1]
+  }
+
   return {
-    setPAR, getBubble
+    setPAR, getBubble, ingechecktLid, saveLid
   }
 })
