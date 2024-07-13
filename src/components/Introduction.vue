@@ -18,11 +18,12 @@
                                         "IkOokje" toevoegen waarin je jouw ervaring kan delen.
                                         <br />
                                         <br />
-De tips in deze applicatie zijn alleen beschikbaar voor de persoonlijk uitgenodigde leden van de tip-bubbel. 
+                                        De tips in deze applicatie zijn alleen beschikbaar voor de persoonlijk
+                                        uitgenodigde leden van de tip-bubbel.
                                     </p>
                                 </v-col>
                                 <v-col cols="6">
-                                    <v-img :src="logo" ></v-img>
+                                    <v-img :src="logo"></v-img>
                                 </v-col>
                             </v-row>
                         </v-container>
@@ -36,25 +37,24 @@ De tips in deze applicatie zijn alleen beschikbaar voor de persoonlijk uitgenodi
                                         Routekaart
                                     </div>
                                     <div class="text-caption">
-                                        <v-btn prepend-icon="mdi-star-plus-outline" title="Voeg een tip toe" class="mb-2"
-                                            to="/newtip">Nieuwe Tip</v-btn>
-                                        <v-btn prepend-icon="mdi-map-search" title="Bekijk tips op de kaart" class="mb-2"
-                                            to="/map">Bekijk Kaart</v-btn>
-                                        <v-btn prepend-icon="mdi-book-search-outline" title="Zoek en Blader door tips" to="/browse"
-                                            class="mb-2">Zoek en Blader</v-btn>
-                                        <v-btn prepend-icon="mdi-clock-fast" title="Bekijk de meest recente wijzigingen in tips, nieuwe IkOokjes en tipverzoeken"
+                                        <v-btn prepend-icon="mdi-star-plus-outline" title="Voeg een tip toe"
+                                            class="mb-2" to="/newtip" v-if="appStore.ingechecktLid != null">Nieuwe
+                                            Tip</v-btn>
+                                        <v-btn prepend-icon="mdi-map-search" title="Bekijk tips op de kaart"
+                                            class="mb-2" to="/map">Bekijk Kaart</v-btn>
+                                        <v-btn prepend-icon="mdi-book-search-outline" title="Zoek en Blader door tips"
+                                            to="/browse" class="mb-2">Zoek en Blader</v-btn>
+                                        <v-btn prepend-icon="mdi-clock-fast"
+                                            title="Bekijk de meest recente wijzigingen in tips, nieuwe IkOokjes en tipverzoeken"
                                             class="mb-2" to="/recent">Recente Wijzigingen</v-btn>
                                         <v-btn prepend-icon="mdi-frequently-asked-questions" title="Vraag om een tip"
-                                            class="mb-2" to="/request">Vraag om Tip</v-btn>
+                                            class="mb-2" to="/request" v-if="appStore.ingechecktLid != null">Vraag om
+                                            Tip</v-btn>
                                         <v-btn prepend-icon="mdi-human-male-female" title="Leden van de Tip Bubbel"
                                             class="mb-2" to="/members">Tippers</v-btn>
                                     </div>
                                 </div>
                             </v-card-item>
-
-                            <v-card-actions>
-
-                            </v-card-actions>
                         </v-card> </v-col>
                 </v-row>
             </v-main>
@@ -65,5 +65,6 @@ De tips in deze applicatie zijn alleen beschikbaar voor de persoonlijk uitgenodi
 
 <script setup>
 import logo from '@/assets/anne-was-hier.png'
-
+import { useAppStore } from "@/stores/app";
+const appStore = useAppStore()
 </script>
