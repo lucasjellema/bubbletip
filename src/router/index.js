@@ -15,6 +15,8 @@ import members from '@/pages/members.vue';
 import browse from '@/pages/browse.vue';
 import recent from '@/pages/recent.vue';
 import index from '@/pages/index.vue';
+import checkin from '@/pages/checkin.vue';
+import profile from '@/pages/profile.vue';
 
 const createRoutes = () => {
 //  const r = setupLayouts(routes)
@@ -27,6 +29,8 @@ const createRoutes = () => {
   r.push({ path: '/members',name: 'members', component: members })
   r.push({ path: '/browse',name: 'browse', component: browse })
   r.push({ path: '/recent',name: 'recent', component: recent })
+  r.push({ path: '/checkin',name: 'checkin', component: checkin })
+  r.push({ path: '/profile',name: 'profile', component: profile })
   return r
 }
 
