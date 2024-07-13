@@ -95,14 +95,44 @@ export const useAppStore = defineStore('app', () => {
       lid.geboortedatum = geboortedatum
       lid.introductie = introductie
     } else {
-      const lidSequence = bubbleJSON.value.leden.push({ gebruikersnaam: gebruikersnaam, voornaam: voornaam, achternaam: achternaam, geboortedatum: geboortedatum, introductie: introductie })
+      const lidSequence = bubbleJSON.value.leden.push({ aanmaakdatum: new Date(), gebruikersnaam: gebruikersnaam, voornaam: voornaam, achternaam: achternaam, geboortedatum: geboortedatum, introductie: introductie })
       lid = bubbleJSON.value.leden[lidSequence - 1]
     }
     bubbleChanged()
     return lid
   }
+  const saveTip = (tip) => {
+    if (tip.id) {
+      const index = bubbleJSON.value.tips.findIndex(t => t.id === tip.id)
+      if (index > -1) {
+        bubbleJSON.value.tips[index] = tip
+      } else {
+        // weird: id is set but tip is not found. TODO error
+      } 
+    } else {
+        tip.id = new Date().getTime()
+        bubbleJSON.value.tips.push(tip)
+      }
+    
+    bubbleChanged()
+  }
+
+  const getRecent = () => {
+    const recent = []
+    // create entries for members
+    for (const lid of bubbleJSON.value.leden) {
+      recent.push({ type: 'lid', label: lid.gebruikersnaam, datum: lid.aanmaakdatum , details: lid.voornaam + ' ' + lid.achternaam, id: lid.gebruikersnaam}) 
+    }
+    // create entries for tips
+    for (const tip of bubbleJSON.value.tips) {
+      recent.push({ type: 'tip', label: tip.naam, datum: tip.aanmaakdatum, details: tip.tipType + ' ' + tip.adresgegevens, id: tip.id})
+    }
+    // TODO gevraagde tips, ikookjes
+     
+    return recent.sort((a, b) => a.datum - b.datum)
+  }
 
   return {
-    setPAR, getBubble, ingechecktLid, saveLid
+    setPAR, getBubble, ingechecktLid, saveLid, saveTip, getRecent
   }
 })
