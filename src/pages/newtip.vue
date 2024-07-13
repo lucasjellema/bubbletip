@@ -5,14 +5,14 @@
       <v-col class="py-2" cols="12">
         <p>Type Tip</p>
         <v-btn-toggle v-model="tipType" mandatory color="deep-purple-accent-3">
-          <v-btn value="verblijf">
+          <v-btn value="verblijf" title="Overnachtingsplek - hotel, camping, appartement, ...">
             <v-icon start>
               mdi-bed
             </v-icon>
             <span class="hidden-sm-and-down">Overnachtingsplek</span>
           </v-btn>
 
-          <v-btn value="restaurant">
+          <v-btn value="restaurant" title="Plek om te eten - restaurant, cafe, pizzeria, bakkerij, ...">
             <v-icon start>
               mdi-silverware-fork-knife
             </v-icon>
@@ -31,22 +31,28 @@
     </v-row>
     <v-row>
       <v-col class="py-2" cols="8">
-        <v-text-field label="Naam" v-model="naam" hint="Naam van hotel, restaurant, museum, attractie"></v-text-field>
+        <v-text-field label="Naam" v-model="naam" hint="Naam van hotel, camping, restaurant, museum, attractie"></v-text-field>
       </v-col>
     </v-row>
     <v-row>
       <v-col class="py-2" cols="8">
-        <v-text-field label="Adres" v-model="adresgegevens" hint="Straat, huisnummer, postcode, stad, land"></v-text-field>
+        <v-text-field label="Adres" v-model="adresgegevens"
+          hint="Straat, huisnummer, postcode, stad, land"></v-text-field>
       </v-col>
     </v-row>
     <v-row>
       <v-col class="py-2" cols="8">
-        <v-text-field label="Website" v-model="website" hint="website (url) van hotel, restaurant, museum, attractie"></v-text-field>
+        <v-text-field label="Website" v-model="website"
+          hint="website (url) van hotel, restaurant, museum, attractie"></v-text-field>
       </v-col>
     </v-row>
     <v-row>
       <v-col class="py-2" cols="8">
-        <v-textarea label="Beschrijving" v-model="beschrijving" hint="beschrijving van hotel, restaurant, museum, attractie: wat is het? waarom is het leuk? hoe kom je er? wat kost het?"></v-textarea>
+        <p>Beschrijving (van hotel, restaurant, museum, attractie: wat is het? waarom is het leuk? hoe kom je er? wat kost het?)</p>
+        <v-sheet class="flex-1-1-100  ma-0 pa-0 mb-3">
+          <QuillEditor theme="snow" toolbar="essential" v-model:content="beschrijving" contentType="delta" />
+        </v-sheet>
+        <!-- <v-textarea label="Beschrijving" v-model="beschrijving" hint="beschrijving van hotel, restaurant, museum, attractie: wat is het? waarom is het leuk? hoe kom je er? wat kost het?"></v-textarea> -->
       </v-col>
     </v-row>
     <v-row>
@@ -58,6 +64,9 @@
 <script setup>
 import { useAppStore } from "@/stores/app";
 import { onBeforeMount, onMounted } from "vue";
+import { QuillEditor } from '@vueup/vue-quill'
+import '@vueup/vue-quill/dist/vue-quill.snow.css';
+
 const appStore = useAppStore()
 const bubble = appStore.getBubble()
 

@@ -69,3 +69,13 @@ npm run deploy
 The first time this deployment is ran, a new branch is created - called `gh-pages` - and the GitHub project is configured for GitHub Pages, including GitHub actions for do the actual deployment. 
 
 To resolve errors "Dynamic import error, reloading page did not fix it TypeError: Failed to fetch dynamically imported module" I have removed the dynamic route creation and replaced it with static route definitions. 
+
+# Add Quill Editor
+
+npm i @vueup/vue-quill --save
+
+Now the QuillEditor can be used for allowing rich text editing, for example like this (in newtip.vue):
+
+        <v-sheet class="flex-1-1-100  ma-0 pa-0 mb-3">
+          <QuillEditor theme="snow" toolbar="essential" v-model:content="beschrijving" contentType="delta" />
+        </v-sheet>
