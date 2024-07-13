@@ -8,7 +8,7 @@
         <v-text-field label="Geboortedatum" type="date" v-model="geboortedatum" </v-text-field>
           <v-textarea label="Introductie" prepend-icon="mdi-text-account" v-model="introductie"
             hint="introductie"></v-textarea>
-          <v-btn title="Sla gegevens op" class="mb-2" @click="saveLid()">Opslaan</v-btn>
+          <v-btn title="Sla gegevens op" class="mb-2" @click="saveLid()" v-if="appStore.ingechecktLid?.gebruikersnaam==gebruikersnaam">Opslaan</v-btn>
       </v-col>
     </v-row>
   </v-container>
@@ -23,15 +23,15 @@ const route = useRoute();
 const gebruikersnaam = route.params.gebruikersnaam;
 
 const appStore = useAppStore()
+const bubble = appStore.getBubble()
+const lid = bubble.value.leden.find(lid => lid.gebruikersnaam === gebruikersnaam)
 
-// TODO get lid details for gebruikersnaam
-// TODO only edit if lid is ingecheckt lid (or admin mode)
-const voornaam = ref(appStore.ingechecktLid.voornaam)
-const achternaam = ref(appStore.ingechecktLid.achternaam)
-const geboortedatum = ref(appStore.ingechecktLid.geboortedatum)
-const introductie = ref(appStore.ingechecktLid.introductie)
+const voornaam = ref(lid.voornaam)
+const achternaam = ref(lid.achternaam)
+const geboortedatum = ref(lid.geboortedatum)
+const introductie = ref(lid.introductie)
 
 const saveLid = () => {
-  appStore.saveLid(appStore.ingechecktLid.gebruikersnaam, voornaam.value, achternaam.value, geboortedatum.value, introductie.value)
+  appStore.saveLid(gebruikersnaam, voornaam.value, achternaam.value, geboortedatum.value, introductie.value)
 }
 </script>
