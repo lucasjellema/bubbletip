@@ -1,5 +1,5 @@
 <template>
-  <h1>Profiel van {{ appStore.ingechecktLid.gebruikersnaam }}</h1>
+  <h1>Profiel van {{ gebruikersnaam }}</h1>
   <v-container fluid>
     <v-row>
       <v-col cols="6">
@@ -17,8 +17,15 @@
 
 <script setup>
 import { useAppStore } from "@/stores/app";
+import { useRoute } from 'vue-router';
+
+const route = useRoute();
+const gebruikersnaam = route.params.gebruikersnaam;
+
 const appStore = useAppStore()
 
+// TODO get lid details for gebruikersnaam
+// TODO only edit if lid is ingecheckt lid (or admin mode)
 const voornaam = ref(appStore.ingechecktLid.voornaam)
 const achternaam = ref(appStore.ingechecktLid.achternaam)
 const geboortedatum = ref(appStore.ingechecktLid.geboortedatum)
