@@ -1,9 +1,9 @@
 <template>
     <div>
-        <p>Klik op de kaart om de locatie aan te geven van jouw tip. Je kunt de marker verplaatsen of een nieuwe
+        <p  v-if="!readOnly">Klik op de kaart om de locatie aan te geven van jouw tip. Je kunt de marker verplaatsen of een nieuwe
             plaatsen.</p>
         <div id="map" style="height: 500px;"></div>
-        <p>Je kunt de adresgegevens voor de tip opvragen als je de marker hebt geplaatst.</p>
+        <p v-if="!readOnly">Je kunt de adresgegevens voor de tip opvragen als je de marker hebt geplaatst.</p>
     </div>
 </template>
 <script setup>
@@ -22,6 +22,10 @@ const props = defineProps({
     label: {
         type: String,
         default: 'Klik op de kaart om de locatie te bepalen'
+    },
+    readOnly: {
+        type: Boolean,
+        default: false
     }
 })
 onMounted(() => {
@@ -45,14 +49,18 @@ const initMap = () => {
 
     // Add initial marker if coordinates are provided
     marker = L.marker([props.initialCoordinates.lat, props.initialCoordinates.lng], {
-        draggable: true
+        draggable: !props.readOnly
     }).addTo(map).bindPopup(props.label).openPopup();
 
-    // Event listener for marker drag
-    marker.on('dragend', onMarkerDrag);
+    if (!props.readOnly) {
 
-    // Event listener for map click
-    map.on('click', onMapClick);
+
+        // Event listener for marker drag
+        marker.on('dragend', onMarkerDrag);
+
+        // Event listener for map click
+        map.on('click', onMapClick);
+    }
 }
 const onMarkerDrag = (event) => {
     const position = event.target.getLatLng();
