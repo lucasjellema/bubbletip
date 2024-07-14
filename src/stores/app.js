@@ -51,9 +51,11 @@ export const useAppStore = defineStore('app', () => {
   const bubbleJSON = ref(null)
   const bubbleHasChanged = ref(false)
   watch(bubbleJSON, () => {
-    console.log(`#### bubble has changed`)
+    console.log(`#### bubble has changed says watch!!`)
     bubbleHasChanged.value = true
-  })
+  },
+  { deep: true }
+)
 
   const bubbleChanged = () => {
     bubbleHasChanged.value = true
