@@ -100,7 +100,7 @@
       <v-col class="py-2" cols="6">
 
         <MapComponent :initialCoordinates="{ lat: 51.505, lng: 5.09 }" :label="naam" v-model="geocoordinates"
-          @update:coordinates="updateCoordinates" />
+          @update:coordinates="updateCoordinates" :coordinates="geocoordinates" />
 
         <v-btn @click="refreshLocationDetailsThroughGeocoder()"
           title="Gebruik geodecoding om adresgegevens op te halen op basis van geocoordinaten"
@@ -113,19 +113,49 @@
 
       </v-col>
     </v-row>
+    <v-row>
+      <v-col class="py-2" cols="6">
+        <h3>Images</h3>
+        <v-data-table :headers="headers" :items="images" :items-per-page="5" class="elevation-1">
+          <template v-slot:item.imageURL="{ item }">
+            {{ item.imageLabel }} <p v-if="item.exifData?.dateTimeOriginal">gemaakt op {{ formatDate(new
+              Date(item.exifData.dateTimeOriginal)) }}</p>
+            <v-img :src="item.imageURL" aspect-ratio="1.7" height="200" v-if="item.imageURL"></v-img>
+            <v-img :src="item.imageBase64" aspect-ratio="1.7" height="200" v-if="item.imageBase64"></v-img>
+            <v-btn prepend-icon="mdi-map-marker-radius"
+              title="Gebruik de GPS info in de foto om de geocoordinaten voor de kaart te bepalen "
+              @click="defineTipCoordinatesFromEXIFGPS(item)" v-if="item.exifData.gpsInfo.latitude">Zet marker op de
+              kaart</v-btn>
+
+          </template>
+        </v-data-table>
+
+        <v-text-field label="Image URL" class="mb-2" v-model="imageURL"></v-text-field>
+        <v-file-input v-model="uploadedImageFile" label="Upload Image" accept="image/*"
+          @change="previewImage"></v-file-input>
+        <v-text-field label="Beschrijving" class="mb-2" v-model="imageLabel"></v-text-field>
+        <v-btn title="Voeg image toe" @click="addImage()">Voeg image toe</v-btn>
+      </v-col>
+      <v-col class="py-2" cols="4">
+        <v-img :src="imageURL" aspect-ratio="1.7" ref="newImage"></v-img>
+        <v-img :src="uploadedImage" aspect-ratio="1.7" ref="newUploadedImage"></v-img>
+      </v-col>
+    </v-row>
   </v-container>
   <v-btn title="Sla tip op" class="mb-2" @click="saveTip()">Sla Tip Op</v-btn>
 </template>
 
 <script setup>
 import { useGeoLibrary } from '@/composables/useGeoLibrary';
-const { reverseGeocode } = useGeoLibrary();
+const { reverseGeocode, extractEXIFData } = useGeoLibrary();
 
 import { useAppStore } from "@/stores/app";
 import { onBeforeMount, onMounted } from "vue";
 import { QuillEditor } from '@vueup/vue-quill'
 import '@vueup/vue-quill/dist/vue-quill.snow.css';
 import MapComponent from '@/components/MapComponent.vue';
+import { useDateLibrary } from '@/composables/useDateLibrary';
+const { formatDate } = useDateLibrary();
 
 const appStore = useAppStore()
 const bubble = appStore.getBubble()
@@ -149,9 +179,45 @@ const wanneer = ref(null)
 const methoeveel = ref(1)
 const metwie = ref('')
 const beoordeling = ref(1) // 0 = ok/goed, 1= heel/erg goed, 2 = super/topperdetop
-// fotos
+const images = ref([])
+// image = {imageURL, caption, aanmaakdatum, exifData}
+const imageURL = ref('')
+const imageLabel = ref('')
+const newImage = ref(null)
+const uploadedImage = ref(null)
+const uploadedImageFile = ref(null)
+const uploadedImageEXIFData = ref(null)
 
-//
+const addImage = () => {
+  images.value.push({
+    imageURL: imageURL.value, imageBase64: uploadedImage.value
+    , imageFile: uploadedImageFile.value, imageLabel: imageLabel.value, aanmaakdatum: new Date(), exifData: uploadedImageEXIFData.value
+  })
+  imageURL.value = ''
+  imageLabel.value = ''
+  uploadedImageEXIFData.value = null
+  uploadedImage.value = null
+  uploadedImageFile.value = null
+}
+const headers = [
+  {
+    title: 'Image', key: 'imageURL', sortable: false
+  },
+]
+
+const previewImage = async () => {
+  if (uploadedImageFile.value) {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      uploadedImage.value = e.target.result;
+    };
+    reader.readAsDataURL(uploadedImageFile.value);
+    const exifData = await extractEXIFData(uploadedImageFile.value);
+    uploadedImageEXIFData.value = exifData
+    console.log("&&&&& EXIF DATA: ", exifData);
+  }
+}
+
 
 const updateCoordinates = (newCoordinates) => {
   geocoordinates.value = newCoordinates;
@@ -172,13 +238,22 @@ const refreshLocationDetailsThroughGeocoder = async () => {
   }
 }
 
-const saveTip = () => {
-  const tip = {
-    tipType: tipType.value, tipGever: appStore.ingechecktLid.gebruikersnaam, aanmaakdatum: new Date(), naam: naam.value
-    , adresgegevens: adresgegevens.value, straat: straat.value, postcode: postcode.value, wijk: wijk.value, huisnummer: huisnummer.value, land: land.value, stad: stad.value, 
-    website: website.value, beschrijving: beschrijving.value, geocoordinates: geocoordinates.value, tags: tags.value, wanneer: wanneer.value
-    , methoeveel: methoeveel.value, metwie: metwie.value, beoordeling: beoordeling.value
+const defineTipCoordinatesFromEXIFGPS = (item) => {
+  if (item.exifData && item.exifData.gpsInfo.latitude && item.exifData.gpsInfo.longitude) {
+    geocoordinates.value = {
+      lat: item.exifData.gpsInfo.latitude,
+      lng: item.exifData.gpsInfo.longitude
+    }
   }
-  appStore.saveTip(tip)
 }
+
+  const saveTip = () => {
+    const tip = {
+      tipType: tipType.value, tipGever: appStore.ingechecktLid.gebruikersnaam, aanmaakdatum: new Date(), naam: naam.value
+      , adresgegevens: adresgegevens.value, straat: straat.value, postcode: postcode.value, wijk: wijk.value, huisnummer: huisnummer.value, land: land.value, stad: stad.value,
+      website: website.value, beschrijving: beschrijving.value, geocoordinates: geocoordinates.value, tags: tags.value, wanneer: wanneer.value
+      , methoeveel: methoeveel.value, metwie: metwie.value, beoordeling: beoordeling.value, images: images.value
+    }
+    appStore.saveTip(tip)
+  }
 </script>

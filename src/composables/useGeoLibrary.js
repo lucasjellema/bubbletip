@@ -1,4 +1,36 @@
+import exifr from 'exifr';
+
 export function useGeoLibrary() {
+
+
+    const extractEXIFData = async (imageFile) => {
+        return new Promise(async (resolve, reject) => {
+            try {
+                const output = await exifr.parse(imageFile, { gps: true });
+                console.log(output); // Logs all extracted metadata
+                if (output) {
+
+                    //          const dateTimeOriginal = output.DateTimeOriginal;
+                    // Mon Mar 12 2018 08:10:41 GMT+0100 (Central European Standard Time) {}
+                    const dateTimeOriginal = output.DateTimeOriginal;
+
+                    const gpsInfo = {
+                        GPSLatitude: output.GPSLatitude, // GPSLatitude is in degrees (N = +, S = -) :   (3) [47, 29, 55.37]
+                        GPSLongitude: output.GPSLongitude, // GPSLongitude is in degrees (E = +, W = -) : (3) [19, 4, 12.69]
+                        altitude: output.GPSAltitude, // GPSAltitude is in meters above sea level    : 119.16872427983539
+                        latitude: output.latitude, // 47.49871388888889
+                        longitude: output.longitude, // 19.070191666666666
+                    };
+                    resolve({ dateTimeOriginal, gpsInfo }); // Returns { dateTimeOriginal, gpsInfo };
+                }
+                console.warn('No EXIF data found:');
+                resolve(null)
+            } catch (error) {
+                console.error('Error extracting EXIF data:', error);
+                reject(error);
+            }
+        })}
+
 
     const reverseGeocode = (longitude, latitude) => {
 
@@ -20,7 +52,7 @@ export function useGeoLibrary() {
                     site.postcode = data.address.postcode
                     site.class = data.class
                     site.type = data.type
-                    site.quarter = data.address.quarter||data.address.neighbourhood
+                    site.quarter = data.address.quarter || data.address.neighbourhood
                     site.addresstype = data.addresstype
                     site.house_number = data.address.house_number
 
@@ -34,8 +66,8 @@ export function useGeoLibrary() {
                     }
                     resolve(site)
                 })
-                .catch(error => {console.error('Error in reverseGeocode:', error); reject(error)});
+                .catch(error => { console.error('Error in reverseGeocode:', error); reject(error) });
         });
     }
-    return { reverseGeocode };
+    return { reverseGeocode,extractEXIFData };
 }

@@ -1,6 +1,7 @@
 <template>
     <div>
-        <p  v-if="!readOnly">Klik op de kaart om de locatie aan te geven van jouw tip. Je kunt de marker verplaatsen of een nieuwe
+        <p v-if="!readOnly">Klik op de kaart om de locatie aan te geven van jouw tip. Je kunt de marker verplaatsen of
+            een nieuwe
             plaatsen.</p>
         <div id="map" style="height: 500px;"></div>
         <p v-if="!readOnly">Je kunt de adresgegevens voor de tip opvragen als je de marker hebt geplaatst.</p>
@@ -18,6 +19,9 @@ const props = defineProps({
             lat: 51.505,
             lng: -0.09
         }
+    }, coordinates: {
+        type: Object
+
     },
     label: {
         type: String,
@@ -36,6 +40,11 @@ let map, marker
 watch(() => props.label
     , (newValue, oldValue) =>
         marker.setPopupContent(newValue)
+)
+
+watch(() => props.coordinates
+    , (newValue, oldValue) =>
+        replaceMarker(newValue.lat, newValue.lng)
 )
 
 const initMap = () => {
@@ -67,17 +76,23 @@ const onMarkerDrag = (event) => {
     emit('update:coordinates', { lat: position.lat, lng: position.lng });
 }
 
-const onMapClick = (event) => {
+const replaceMarker = (lat, lng) => {
+
     if (marker) {
         map.removeLayer(marker);
     }
-    marker = L.marker([event.latlng.lat, event.latlng.lng], {
+    marker = L.marker([lat, lng], {
         draggable: true
     }).addTo(map).bindPopup(props.label).openPopup();
 
     // Event listener for marker drag
     marker.on('dragend', onMarkerDrag);
 
+
+}
+
+const onMapClick = (event) => {
+    replaceMarker(event.latlng.lat, event.latlng.lng);
     emit('update:coordinates', { lat: event.latlng.lat, lng: event.latlng.lng });
 }
 </script>
