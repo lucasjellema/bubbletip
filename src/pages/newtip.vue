@@ -116,7 +116,7 @@
     <v-row>
       <v-col class="py-2" cols="6">
         <h3>Images</h3>
-        <v-data-table :headers="headers" :items="images" :items-per-page="5" class="elevation-1">
+        <v-data-table :headers="imageHeaders" :items="images" :items-per-page="5" class="elevation-1">
           <template v-slot:item.imageURL="{ item }">
             {{ item.imageLabel }} <p v-if="item.exifData?.dateTimeOriginal">gemaakt op {{ formatDate(new
               Date(item.exifData.dateTimeOriginal)) }}</p>
@@ -199,7 +199,7 @@ const addImage = () => {
   uploadedImage.value = null
   uploadedImageFile.value = null
 }
-const headers = [
+const imageHeaders = [
   {
     title: 'Image', key: 'imageURL', sortable: false
   },

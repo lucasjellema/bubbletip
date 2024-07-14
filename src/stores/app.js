@@ -54,8 +54,8 @@ export const useAppStore = defineStore('app', () => {
     console.log(`#### bubble has changed says watch!!`)
     bubbleHasChanged.value = true
   },
-  { deep: true }
-)
+    { deep: true }
+  )
 
   const bubbleChanged = () => {
     bubbleHasChanged.value = true
@@ -70,7 +70,7 @@ export const useAppStore = defineStore('app', () => {
 
   const initializeBubble = async () => {
     // read bubble.json from par
-    bubbleJSON.value = await getJSONFile('bubble.json')
+    bubbleJSON.value = await getJSONFile('bubbled.json')
     console.log(bubbleJSON.value)
     // if not found, create it
     if (bubbleJSON.value == 1) {
@@ -104,6 +104,21 @@ export const useAppStore = defineStore('app', () => {
     return lid
   }
   const saveTip = (tip) => {
+    // any image that does not have an id should be processed
+    // loop over tip.images
+    for (const image of tip.images) {
+      if (!image.id) {
+        image.id = new Date().getTime()
+      }
+      if (image.imageFile) {
+        saveFile(image.imageFile, 'images/' + image.id + '.jpg')
+        image.imageURL = preAuthenticatedRequestURL.value + 'images/' + image.id + '.jpg'
+        image.imageFile = null
+        image.imageBase64 = null
+      }
+
+    }
+
     if (tip.id) {
       const index = bubbleJSON.value.tips.findIndex(t => t.id === tip.id)
       if (index > -1) {
@@ -135,7 +150,7 @@ export const useAppStore = defineStore('app', () => {
   }
 
 
-  const saveIncident = (incident) => {    
+  const saveIncident = (incident) => {
     if (bubbleJSON.value.incidenten == null) {
       bubbleJSON.value.incidenten = []
     }
