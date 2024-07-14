@@ -4,7 +4,8 @@
     <v-container fluid>
         <v-row>
             <v-col class="py-2" cols="12">
-                <h2><v-icon start>{{ tipTypeIconMap[model.tipType] }}</v-icon>{{ model.naam }}</h2>
+                <v-btn @click="gotoEditTip()" v-if="model.tipGever = appStore.ingechecktLid?.gebruikersnaam">Bewerk Tip</v-btn>
+                <h2 class="mr-4"><v-icon start>{{ tipTypeIconMap[model.tipType] }}</v-icon>{{ model.naam }}</h2>
                 <i>Getipt door {{ model.tipGever }} op {{ formatDate(model.aanmaakdatum) }} </i>
             </v-col>
         </v-row>
@@ -32,6 +33,9 @@
             <v-col class="py-2" cols="6">
                 <MapComponent :initialCoordinates="model.geocoordinates" :label="model.naam"
                     v-model="model.geocoordinates" :readOnly="true" v-if="model.geocoordinates" />
+                    <v-btn prepend-icon="mdi-google-maps"
+                                            v-if="model.geocoordinates"
+                                            class="mb-2" :href="`https://www.google.com/maps/@${model.geocoordinates.lat},${model.geocoordinates.lng},16z`" target="_blank"	>Open locatie in Google Maps</v-btn>
             </v-col>
         </v-row>
         <v-row>
@@ -50,15 +54,22 @@
         <v-row>
             <v-col class="py-2" cols="12">IkOokjes</v-col>
         </v-row>
+        
     </v-container>
 </template>
 
 <script setup>
+import { useRouter } from 'vue-router'
+
+const router = useRouter()
 import { QuillEditor } from '@vueup/vue-quill'
 import '@vueup/vue-quill/dist/vue-quill.snow.css';
 import ErrorBoundary from '@/components/ErrorBoundary.vue';
 import { useDateLibrary } from '@/composables/useDateLibrary';
 const { formatDate } = useDateLibrary();
+
+import { useAppStore } from "@/stores/app";
+const appStore = useAppStore()
 
 const model = defineModel()
 
@@ -74,5 +85,8 @@ const imageHeaders = [
     },
 ]
 
+const gotoEditTip = () => {
+    router.push({ name: 'editTip', params: { tipId: model.id } });
+}
 
 </script>
