@@ -92,9 +92,9 @@
               <v-sheet class="flex-1-1-100  ma-0 pa-0 mb-3">
                 <QuillEditor theme="snow" toolbar="essential" v-model:content="beschrijving" contentType="delta" />
               </v-sheet>
-              <v-combobox v-model="tags" :items="tipTags" chips clearable deletable-chips multiple
-                  label="Voeg tags toe" append-icon="mdi-tag-plus" @change="handleTagChange"
-                  :menu-props="{ maxHeight: 'auto' }" class="ma-0 mt-5" </v-combobox>
+              <v-combobox v-model="tags" :items="Array.from(tipTags)" chips clearable deletable-chips multiple label="Voeg tags toe"
+                append-icon="mdi-tag-plus" @change="handleTagChange" :menu-props="{ maxHeight: 'auto' }"
+                class="ma-0 mt-5" </v-combobox>
 
             </v-col>
           </v-row>
@@ -119,7 +119,7 @@
     </v-row>
     <v-row>
       <v-col class="py-2" cols="6">
-        <h3>Foto's  </h3>
+        <h3>Foto's </h3>
         <v-data-table :headers="imageHeaders" :items="images" :items-per-page="5" class="elevation-1">
           <template v-slot:item.imageURL="{ item }">
             {{ item.imageLabel }} <p v-if="item.exifData?.dateTimeOriginal">gemaakt op {{ formatDate(new
@@ -135,9 +135,11 @@
         </v-data-table>
 
         <v-text-field label="URL van plaatje op internet" class="mb-2" v-model="imageURL"></v-text-field>
-        <v-file-input v-model="uploadedImageFile" label="Upload een Foto" accept="image/*"
-          @change="previewImage"></v-file-input>
-        <v-text-field label="Beschrijving" class="mb-2" v-model="imageLabel"></v-text-field>
+        <div @paste.prevent="handlePaste">
+          <v-file-input v-model="uploadedImageFile" label="Upload een Foto" accept="image/*"
+            @change="previewImage"></v-file-input>
+          <v-text-field label="Beschrijving" class="mb-2" v-model="imageLabel"></v-text-field>
+        </div>
         <v-btn title="Voeg image toe" @click="addImage()">Voeg image toe</v-btn>
       </v-col>
       <v-col class="py-2" cols="4">
@@ -178,7 +180,7 @@ const wijk = ref('')
 const huisnummer = ref('')
 
 const tags = ref([])
-const tipTags = appStore.tipTags  
+const tipTags = appStore.tipTags
 // oorspronkelijk ikookje
 const wanneer = ref(null)
 const methoeveel = ref(1)
@@ -219,10 +221,38 @@ const previewImage = async () => {
     reader.readAsDataURL(uploadedImageFile.value);
     const exifData = await extractEXIFData(uploadedImageFile.value);
     uploadedImageEXIFData.value = exifData
-    console.log("&&&&& EXIF DATA: ", exifData);
+    
   }
 }
 
+const handlePaste = async (event) => {
+
+  if (event.clipboardData?.items) {
+    const items = event.clipboardData.items;
+    for (let i = 0; i < items.length; i++) {
+      // Check if the item is an image
+      if (items[i].type.indexOf("image") !== -1) {
+        const file = items[i].getAsFile();
+    //    uploadedImage.value = file
+                    uploadedImageFile.value = file
+previewImage()
+      }
+
+      // if item is a string that is a valid URL - set the imageUrl property 
+      // 
+      if (items[i].type.indexOf("text") !== -1) {
+        const text = (event.clipboardData || window.clipboardData).getData('text');
+        if (isValidImageUrl(text)) { // Implement isValidImageUrl according to your needs
+          imageUrl.value = text
+        }
+      }
+    }
+  }
+}
+
+const isValidImageUrl = (url) => {
+  return url.match(/\.(jpeg|jpg|gif|png)$/i) != null;
+}
 
 const updateCoordinates = (newCoordinates) => {
   geocoordinates.value = newCoordinates;
@@ -252,17 +282,17 @@ const defineTipCoordinatesFromEXIFGPS = (item) => {
   }
 }
 
-  const saveTip = () => {
-    const tip = {
-      tipType: tipType.value, tipGever: appStore.ingechecktLid.gebruikersnaam, aanmaakdatum: new Date(), naam: naam.value
-      , adresgegevens: adresgegevens.value, straat: straat.value, postcode: postcode.value, wijk: wijk.value, huisnummer: huisnummer.value, land: land.value, stad: stad.value,
-      website: website.value, beschrijving: beschrijving.value, geocoordinates: geocoordinates.value, tags: tags.value, wanneer: wanneer.value
-      , methoeveel: methoeveel.value, metwie: metwie.value, beoordeling: beoordeling.value, images: images.value
-    }
-    appStore.saveTip(tip)
+const saveTip = () => {
+  const tip = {
+    tipType: tipType.value, tipGever: appStore.ingechecktLid.gebruikersnaam, aanmaakdatum: new Date(), naam: naam.value
+    , adresgegevens: adresgegevens.value, straat: straat.value, postcode: postcode.value, wijk: wijk.value, huisnummer: huisnummer.value, land: land.value, stad: stad.value,
+    website: website.value, beschrijving: beschrijving.value, geocoordinates: geocoordinates.value, tags: tags.value, wanneer: wanneer.value
+    , methoeveel: methoeveel.value, metwie: metwie.value, beoordeling: beoordeling.value, images: images.value
   }
+  appStore.saveTip(tip)
+}
 
-  const handleTagChange = (newValue) => {
+const handleTagChange = (newValue) => {
   // Handle the change event
   // This is where you might want to add logic to update the list of tags
   // For example, you could add the newly entered tag to `availableTags`
