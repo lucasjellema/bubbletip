@@ -170,15 +170,13 @@ const refreshLocationDetailsThroughGeocoder = async () => {
     wijk.value = locationDetails.quarter
     huisnummer.value = locationDetails.house_number
   }
-
-
-  console.log('locationDetails', locationDetails)
 }
 
 const saveTip = () => {
   const tip = {
     tipType: tipType.value, tipGever: appStore.ingechecktLid.gebruikersnaam, aanmaakdatum: new Date(), naam: naam.value
-    , adresgegevens: adresgegevens.value, website: website.value, beschrijving: beschrijving.value, geocoordinates: geocoordinates.value, tags: tags.value, wanneer: wanneer.value
+    , adresgegevens: adresgegevens.value, straat: straat.value, postcode: postcode.value, wijk: wijk.value, huisnummer: huisnummer.value, land: land.value, stad: stad.value, 
+    website: website.value, beschrijving: beschrijving.value, geocoordinates: geocoordinates.value, tags: tags.value, wanneer: wanneer.value
     , methoeveel: methoeveel.value, metwie: metwie.value, beoordeling: beoordeling.value
   }
   appStore.saveTip(tip)
