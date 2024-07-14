@@ -1,6 +1,6 @@
 <template>
 
- 
+
     <v-container fluid>
         <v-row>
             <v-col class="py-2" cols="12">
@@ -11,15 +11,18 @@
         <v-row>
             <v-col class="py-2" cols="6">
                 Adres: {{ model.adresgegevens }}
-                <br/><br/>
+                <p v-if="model.website">Website: <a :href="model.website" target="_blank">{{ model.website }}</a></p>
+                <br /><br />
                 Beschrijving:
                 <v-sheet class="flex-1-1-100  ma-0 pa-0 mb-3">
-                    <QuillEditor theme="bubble" :toolbar="[]" v-model:content="model.beschrijving" contentType="delta"
-                        :readOnly="true" />
+                    <ErrorBoundary>
+                        <QuillEditor theme="bubble" :toolbar="[]" v-model:content="model.beschrijving"
+                            contentType="delta" :readOnly="true" />
+                    </ErrorBoundary>
                 </v-sheet>
-                <br/><br/>
+                <br /><br />
                 Tags:
-                
+
             </v-col>
             <v-col class="py-2" cols="6">
                 <MapComponent :initialCoordinates="model.geocoordinates" :label="model.naam"
@@ -28,8 +31,15 @@
         </v-row>
         <v-row>
             <v-col class="py-2" cols="12">Foto's
+                <v-data-table :headers="imageHeaders" :items="model.images" :items-per-page="5" class="elevation-1">
+                    <template v-slot:item.imageURL="{ item }">
+                        {{ item.imageLabel }} <p v-if="item.exifData?.dateTimeOriginal">gemaakt op {{ formatDate(new
+                            Date(item.exifData.dateTimeOriginal)) }}</p>
+                        <v-img :src="item.imageURL" aspect-ratio="1.7" height="500" v-if="item.imageURL"></v-img>
+                    </template>
+                </v-data-table>
 
-                
+
             </v-col>
         </v-row>
         <v-row>
@@ -43,7 +53,7 @@
 <script setup>
 import { QuillEditor } from '@vueup/vue-quill'
 import '@vueup/vue-quill/dist/vue-quill.snow.css';
-
+import ErrorBoundary from '@/components/ErrorBoundary.vue';
 import { useDateLibrary } from '@/composables/useDateLibrary';
 const { formatDate } = useDateLibrary();
 
@@ -54,5 +64,12 @@ const tipTypeIconMap = {
     restaurant: 'mdi-silverware-fork-knife',
     activiteit: 'mdi-walk'
 }
+
+const imageHeaders = [
+    {
+        title: 'Image', key: 'imageURL', sortable: false
+    },
+]
+
 
 </script>
