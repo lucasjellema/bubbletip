@@ -301,7 +301,7 @@ const saveTip = () => {
   const tip = {
     tipType: tipType.value, tipGever: appStore.ingechecktLid.gebruikersnaam, aanmaakdatum: new Date(), naam: naam.value
     , adresgegevens: adresgegevens.value, straat: straat.value, postcode: postcode.value, wijk: wijk.value, huisnummer: huisnummer.value, land: land.value, stad: stad.value,
-    website: website.value, beschrijving: beschrijving.value, geocoordinates: geocoordinates.value, tags: tags.value, wanneer: wanneer.value
+    website: website.value, beschrijving: beschrijving.value, geocoordinates: geocoordinates.value, tags: tags.value, wanneer: {month:maand.value, year:jaar.value} 
     , methoeveel: methoeveel.value, metwie: metwie.value, beoordeling: beoordeling.value, images: images.value
   }
   appStore.saveTip(tip)
