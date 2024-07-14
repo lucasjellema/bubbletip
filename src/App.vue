@@ -7,7 +7,7 @@
       <v-btn prepend-icon="mdi-history" text to="/recent">Laatste Ontwikkelingen</v-btn>
       <v-btn prepend-icon="mdi-book-search-outline" text to="/browse">Zoek en Blader</v-btn>
       <v-btn icon="mdi-map-search" to="/map" title="Bekijk en zoek tips op kaart"></v-btn>
-      <v-btn text to="/request" v-if="appStore.ingechecktLid != null">Vraag om Tip</v-btn>
+      <!-- <v-btn text to="/request" v-if="appStore.ingechecktLid != null">Vraag om Tip</v-btn> -->
       <v-btn  text to="/checkin" v-if="appStore.ingechecktLid == null">Checkin</v-btn>
       <v-btn  text @click="appStore.ingechecktLid=null" v-if="appStore.ingechecktLid != null">Checkout</v-btn>
       <v-btn prepend-icon="mdi-account" text @click="gotoProfile()" title="Bewerk je profiel" v-if="appStore.ingechecktLid != null">{{ appStore.ingechecktLid?.gebruikersnaam }}</v-btn>

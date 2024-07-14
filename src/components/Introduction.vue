@@ -55,9 +55,9 @@
                                         <v-btn prepend-icon="mdi-clock-fast"
                                             title="Bekijk de meest recente wijzigingen in tips, nieuwe IkOokjes en tipverzoeken"
                                             class="mb-2" to="/recent">Recente Wijzigingen</v-btn>
-                                        <v-btn prepend-icon="mdi-frequently-asked-questions" title="Vraag om een tip"
+                                        <!-- <v-btn prepend-icon="mdi-frequently-asked-questions" title="Vraag om een tip"
                                             class="mb-2" to="/request" v-if="appStore.ingechecktLid != null">Vraag om
-                                            Tip</v-btn>
+                                            Tip</v-btn> -->
                                         <v-btn prepend-icon="mdi-human-male-female" title="Leden van de Tip Bubbel"
                                             class="mb-2" to="/members">Tippers</v-btn>
                                     </div>
