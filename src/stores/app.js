@@ -4,6 +4,8 @@ import { defineStore } from 'pinia'
 export const useAppStore = defineStore('app', () => {
   const preAuthenticatedRequestURL = ref(null)
   const ingechecktLid = ref(null)
+const tipTags = ref(new Set(['museum','pizza','ijs','kasteel','camping','kleuters','wandelen'])) 
+
   const setPAR = (par) => {
     preAuthenticatedRequestURL.value = par
     initializeBubble()
@@ -68,6 +70,17 @@ export const useAppStore = defineStore('app', () => {
     }
   }, 5000)
 
+
+  const initializeTipTags = () => {
+    // loop over all tips
+    for (const tip of bubbleJSON.value.tips) {
+      for (const tag of tip.tags) {
+        tipTags.value.add(tag)
+      }
+      // TODO look over ikookjes in tip
+    }
+  }
+
   const initializeBubble = async () => {
     // read bubble.json from par
     bubbleJSON.value = await getJSONFile('bubble.json')
@@ -80,6 +93,9 @@ export const useAppStore = defineStore('app', () => {
       // save it
       saveFile(JSON.stringify(bubbleJSON.value), 'bubble.json')
 
+    } else {
+
+      initializeTipTags()
     }
     periodicBubbleSaver()
     return bubbleJSON
@@ -130,6 +146,9 @@ export const useAppStore = defineStore('app', () => {
       tip.id = new Date().getTime()
       bubbleJSON.value.tips.push(tip)
     }
+    for (const tag of tip.tags) {
+      tipTags.value.add(tag)
+    }
 
     bubbleChanged()
   }
@@ -159,6 +178,6 @@ export const useAppStore = defineStore('app', () => {
   }
 
   return {
-    setPAR, getBubble, ingechecktLid, saveLid, saveTip, getRecent, saveIncident
+    setPAR, getBubble, ingechecktLid, saveLid, saveTip, getRecent, saveIncident, tipTags
   }
 })

@@ -92,6 +92,10 @@
               <v-sheet class="flex-1-1-100  ma-0 pa-0 mb-3">
                 <QuillEditor theme="snow" toolbar="essential" v-model:content="beschrijving" contentType="delta" />
               </v-sheet>
+              <v-combobox v-model="tags" :items="tipTags" chips clearable deletable-chips multiple
+                  label="Voeg tags toe" append-icon="mdi-tag-plus" @change="handleTagChange"
+                  :menu-props="{ maxHeight: 'auto' }" class="ma-0 mt-5" </v-combobox>
+
             </v-col>
           </v-row>
         </v-container>
@@ -115,7 +119,7 @@
     </v-row>
     <v-row>
       <v-col class="py-2" cols="6">
-        <h3>Images</h3>
+        <h3>Foto's  </h3>
         <v-data-table :headers="imageHeaders" :items="images" :items-per-page="5" class="elevation-1">
           <template v-slot:item.imageURL="{ item }">
             {{ item.imageLabel }} <p v-if="item.exifData?.dateTimeOriginal">gemaakt op {{ formatDate(new
@@ -124,14 +128,14 @@
             <v-img :src="item.imageBase64" aspect-ratio="1.7" height="200" v-if="item.imageBase64"></v-img>
             <v-btn prepend-icon="mdi-map-marker-radius"
               title="Gebruik de GPS info in de foto om de geocoordinaten voor de kaart te bepalen "
-              @click="defineTipCoordinatesFromEXIFGPS(item)" v-if="item.exifData.gpsInfo.latitude">Zet marker op de
+              @click="defineTipCoordinatesFromEXIFGPS(item)" v-if="item.exifData?.gpsInfo?.latitude">Zet marker op de
               kaart</v-btn>
 
           </template>
         </v-data-table>
 
-        <v-text-field label="Image URL" class="mb-2" v-model="imageURL"></v-text-field>
-        <v-file-input v-model="uploadedImageFile" label="Upload Image" accept="image/*"
+        <v-text-field label="URL van plaatje op internet" class="mb-2" v-model="imageURL"></v-text-field>
+        <v-file-input v-model="uploadedImageFile" label="Upload een Foto" accept="image/*"
           @change="previewImage"></v-file-input>
         <v-text-field label="Beschrijving" class="mb-2" v-model="imageLabel"></v-text-field>
         <v-btn title="Voeg image toe" @click="addImage()">Voeg image toe</v-btn>
@@ -174,6 +178,7 @@ const wijk = ref('')
 const huisnummer = ref('')
 
 const tags = ref([])
+const tipTags = appStore.tipTags  
 // oorspronkelijk ikookje
 const wanneer = ref(null)
 const methoeveel = ref(1)
@@ -256,4 +261,12 @@ const defineTipCoordinatesFromEXIFGPS = (item) => {
     }
     appStore.saveTip(tip)
   }
+
+  const handleTagChange = (newValue) => {
+  // Handle the change event
+  // This is where you might want to add logic to update the list of tags
+  // For example, you could add the newly entered tag to `availableTags`
+  // if it doesn't already exist, assuming you want to save it for future suggestions.
+  console.log('Tags updated:', newValue);
+}
 </script>

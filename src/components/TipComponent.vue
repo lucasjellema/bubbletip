@@ -13,7 +13,7 @@
                 Adres: {{ model.adresgegevens }}
                 <p v-if="model.website">Website: <a :href="model.website" target="_blank">{{ model.website }}</a></p>
                 <br /><br />
-                Beschrijving:
+                Beschrijving en Ervaring:
                 <v-sheet class="flex-1-1-100  ma-0 pa-0 mb-3">
                     <ErrorBoundary>
                         <QuillEditor theme="bubble" :toolbar="[]" v-model:content="model.beschrijving"
@@ -22,6 +22,11 @@
                 </v-sheet>
                 <br /><br />
                 Tags:
+                <div v-if="model?.tags?.length > 0">
+        <v-chip v-for="tag in model?.tags" class="ma-2">
+          {{ tag }}
+        </v-chip>
+      </div>
 
             </v-col>
             <v-col class="py-2" cols="6">
@@ -45,9 +50,7 @@
         <v-row>
             <v-col class="py-2" cols="12">IkOokjes</v-col>
         </v-row>
-
     </v-container>
-    {{ model }}
 </template>
 
 <script setup>
