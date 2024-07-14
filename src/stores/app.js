@@ -70,7 +70,7 @@ export const useAppStore = defineStore('app', () => {
 
   const initializeBubble = async () => {
     // read bubble.json from par
-    bubbleJSON.value = await getJSONFile('bubbled.json')
+    bubbleJSON.value = await getJSONFile('bubble.json')
     console.log(bubbleJSON.value)
     // if not found, create it
     if (bubbleJSON.value == 1) {
