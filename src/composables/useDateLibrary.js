@@ -8,5 +8,21 @@ const formatDate = (date) => {
     return new Date(date).toLocaleDateString('nl-NL', options);
   }
 
-  return { formatDate };
+  const months = [
+    { name: 'Januari', id: 1 },
+    { name: 'Februari', id: 2 },
+    { name: 'Maart', id: 3 },
+    { name: 'April', id: 4 },
+    { name: 'Mei', id: 5 },
+    { name: 'Juni', id: 6 },
+    { name: 'Juli', id: 7 },
+    { name: 'Augustus', id: 8 },
+    { name: 'September', id: 9 },
+    { name: 'Oktober', id: 10 },
+    { name: 'November', id: 11 },
+    { name: 'December', id: 12 }
+  
+  ]
+
+  return { formatDate,months };
 }

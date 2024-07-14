@@ -92,9 +92,22 @@
               <v-sheet class="flex-1-1-100  ma-0 pa-0 mb-3">
                 <QuillEditor theme="snow" toolbar="essential" v-model:content="beschrijving" contentType="delta" />
               </v-sheet>
-              <v-combobox v-model="tags" :items="Array.from(tipTags)" chips clearable deletable-chips multiple label="Voeg tags toe"
-                append-icon="mdi-tag-plus" @change="handleTagChange" :menu-props="{ maxHeight: 'auto' }"
-                class="ma-0 mt-5" </v-combobox>
+              <v-combobox v-model="tags" :items="Array.from(tipTags)" chips clearable deletable-chips multiple
+                label="Voeg tags toe" append-icon="mdi-tag-plus" @change="handleTagChange"
+                :menu-props="{ maxHeight: 'auto' }" class="ma-0 mt-5" </v-combobox>
+                Wanneer was je er?
+              <v-container class="mb-0 mt-1" fluid>
+                <v-row>
+                  <v-col cols="7">
+                    <v-select :items="months" item-title="name" item-value="id" label="Welke Maand?" outlined
+                      v-model="maand"></v-select>
+                  </v-col>
+                  <v-col cols="5">
+
+                    <v-text-field label="In Welk Jaar" type="number" v-model="jaar" />
+                  </v-col>
+                </v-row>
+              </v-container>
 
             </v-col>
           </v-row>
@@ -161,7 +174,7 @@ import { QuillEditor } from '@vueup/vue-quill'
 import '@vueup/vue-quill/dist/vue-quill.snow.css';
 import MapComponent from '@/components/MapComponent.vue';
 import { useDateLibrary } from '@/composables/useDateLibrary';
-const { formatDate } = useDateLibrary();
+const { formatDate, months } = useDateLibrary();
 
 const appStore = useAppStore()
 const bubble = appStore.getBubble()
@@ -178,6 +191,8 @@ const straat = ref('')
 const postcode = ref('')
 const wijk = ref('')
 const huisnummer = ref('')
+const maand = ref('')
+const jaar = ref('')
 
 const tags = ref([])
 const tipTags = appStore.tipTags
@@ -221,7 +236,7 @@ const previewImage = async () => {
     reader.readAsDataURL(uploadedImageFile.value);
     const exifData = await extractEXIFData(uploadedImageFile.value);
     uploadedImageEXIFData.value = exifData
-    
+
   }
 }
 
@@ -233,9 +248,9 @@ const handlePaste = async (event) => {
       // Check if the item is an image
       if (items[i].type.indexOf("image") !== -1) {
         const file = items[i].getAsFile();
-    //    uploadedImage.value = file
-                    uploadedImageFile.value = file
-previewImage()
+        //    uploadedImage.value = file
+        uploadedImageFile.value = file
+        previewImage()
       }
 
       // if item is a string that is a valid URL - set the imageUrl property 
