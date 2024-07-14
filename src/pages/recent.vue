@@ -32,11 +32,8 @@ const recentHeaders = ref([
   //{ title: 'Actions', value: 'actions' },
 ])
 
-const formatDate = (date) => {
-  if (date == null) return
-  const options = { day: '2-digit', month: 'long', year: 'numeric' };
-  return new Date(date).toLocaleDateString('nl-NL', options);
-}
+import { useDateLibrary } from '@/composables/useDateLibrary';
+const { formatDate } = useDateLibrary();
 
 const gotoItem = (item) => {
   if (item.type === 'tip')
