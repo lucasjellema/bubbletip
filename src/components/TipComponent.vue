@@ -14,12 +14,14 @@
                 Adres: {{ model.adresgegevens }}
                 <p v-if="model.website">Website: <a :href="model.website" target="_blank">{{ model.website }}</a></p>
                 <br /><br />
-                Beschrijving en Ervaring:
+                <h3>Beschrijving en Ervaring</h3>
+                <i v-if="model.jaar">(beleefd in {{ months.find(m => m.id == model.maand).name }} {{ model.jaar }})</i>
                 <v-sheet class="flex-1-1-100  ma-0 pa-0 mb-3">
-                    <ErrorBoundary>
+                    {{ model.beschrijving }}
+                    <!-- <ErrorBoundary>
                         <QuillEditor theme="bubble" :toolbar="[]" v-model:content="model.beschrijving"
                             contentType="delta" :readOnly="true" />
-                    </ErrorBoundary>
+                    </ErrorBoundary> -->
                 </v-sheet>
                 <br /><br />
                 Tags:
@@ -66,7 +68,7 @@ import { QuillEditor } from '@vueup/vue-quill'
 import '@vueup/vue-quill/dist/vue-quill.snow.css';
 import ErrorBoundary from '@/components/ErrorBoundary.vue';
 import { useDateLibrary } from '@/composables/useDateLibrary';
-const { formatDate } = useDateLibrary();
+const { formatDate, months } = useDateLibrary();
 
 import { useAppStore } from "@/stores/app";
 const appStore = useAppStore()
