@@ -90,7 +90,8 @@
               <p>Beschrijving (van hotel, restaurant, museum, attractie: wat is het? waarom is het leuk? hoe kom je er?
                 wat kost het?)</p>
               <v-sheet class="flex-1-1-100  ma-0 pa-0 mb-3">
-                <QuillEditor theme="snow" toolbar="essential" v-model:content="beschrijving" contentType="delta" />
+                <v-textarea v-model="beschrijving" variant="outlined" rows="4"></v-textarea>
+                <!-- <QuillEditor theme="snow" toolbar="essential" v-model:content="beschrijving" contentType="delta" /> -->
               </v-sheet>
               <v-combobox v-model="tags" :items="Array.from(tipTags)" chips clearable deletable-chips multiple
                 label="Voeg tags toe" append-icon="mdi-tag-plus" @change="handleTagChange"
