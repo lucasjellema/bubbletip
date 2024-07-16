@@ -56,7 +56,7 @@
                         <v-row>
                             <v-col cols="7">
                                 <v-select :items="months" item-title="name" item-value="id" label="Welke Maand?"
-                                    outlined v-model="model.maand"></v-select>
+                                    outlined v-model="model.wanneer.maand"></v-select>
                             </v-col>
                             <v-col cols="5">
 
@@ -244,6 +244,12 @@ const previewImage = async () => {
     }
 }
 
+const updateCoordinates = (newCoordinates) => {
+    nextTick(() => {
+        model.value.geocoordinates = newCoordinates;
+        
+    })
+}
 const handlePaste = async (event) => {
 
     if (event.clipboardData?.items) {
@@ -284,5 +290,29 @@ const handlePanelChange = (isOpen) => {
             adjust.value++
         })
     }
+}
+
+const refreshLocationDetailsThroughGeocoder = async () => {
+  const coordinates = model.value.geocoordinates
+  if (coordinates != null && coordinates.lat && coordinates.lng) {
+    const locationDetails = await reverseGeocode(coordinates.lng, coordinates.lat)
+    model.value.adresgegevens= locationDetails.address
+    model.value.naam= locationDetails.label
+    model.value.land= locationDetails.country
+    model.value.straat= locationDetails.street
+    model.value.stad= locationDetails.city
+    model.value.postcode= locationDetails.postcode
+    model.value.wijk= locationDetails.quarter
+    model.value.huisnummer= locationDetails.house_number
+  }
+}
+
+const defineTipCoordinatesFromEXIFGPS = (item) => {
+  if (item.exifData && item.exifData.gpsInfo.latitude && item.exifData.gpsInfo.longitude) {
+    model.value.geocoordinates = {
+      lat: item.exifData.gpsInfo.latitude,
+      lng: item.exifData.gpsInfo.longitude
+    }
+  }
 }
 </script>
