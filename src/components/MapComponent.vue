@@ -74,6 +74,8 @@ const initMap = () => {
         attribution: '© OpenStreetMap contributors'
     }).addTo(map);
 
+    // when the map is clicked
+    map.on('click', onMapClick);
     // Add initial marker if coordinates are provided
     if (props.initialCoordinates.lat && props.initialCoordinates.lng) {
         replaceMarker(props.initialCoordinates.lat, props.initialCoordinates.lng)
