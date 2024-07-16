@@ -1,7 +1,7 @@
 <template>
   <h1>Recente Tips, IkOokjes, Leden en Tip Verzoeken</h1>
 
-  <v-data-table :headers="recentHeaders" :items="appStore.getRecent()" item-key="gebruikersnaam" class="elevation-1">
+  <v-data-table :headers="recentHeaders" :items="recentItems" item-key="gebruikersnaam" class="elevation-1">
 
     <template v-slot:item.type="{ item, index }">
       <v-btn @click="gotoItem(item)" text>Details</v-btn>
@@ -23,6 +23,12 @@ const router = useRouter()
 
 const appStore = useAppStore()
 const bubble = appStore.getBubble()
+const recentItems = ref([])
+onMounted (() => {
+  
+  recentItems.value= appStore.getRecent()
+  recentItems.value = recentItems.value.sort((a, b) => new Date(b.datum) - new Date(a.datum))
+})
 
 const recentHeaders = ref([
   { title: 'Type', key: 'type' },
