@@ -4,7 +4,8 @@
     <v-container fluid>
         <v-row>
             <v-col class="py-2" cols="12">
-                <v-btn @click="gotoEditTip()" v-if="model.tipGever = appStore.ingechecktLid?.gebruikersnaam">Bewerk Tip</v-btn>
+                <v-btn @click="gotoEditTip()" v-if="model.tipGever = appStore.ingechecktLid?.gebruikersnaam">Bewerk
+                    Tip</v-btn>
                 <h2 class="mr-4"><v-icon start>{{ tipTypeIconMap[model.tipType] }}</v-icon>{{ model.naam }}</h2>
                 <i>Getipt door {{ model.tipGever }} op {{ formatDate(model.aanmaakdatum) }} </i>
             </v-col>
@@ -23,21 +24,20 @@
                             contentType="delta" :readOnly="true" />
                     </ErrorBoundary> -->
                 </v-sheet>
-                <br /><br />
-                Tags:
+                <br />
                 <div v-if="model?.tags?.length > 0">
-        <v-chip v-for="tag in model?.tags" class="ma-2">
-          {{ tag }}
-        </v-chip>
-      </div>
+                    <v-chip v-for="tag in model?.tags" class="ma-2">
+                        {{ tag }}
+                    </v-chip>
+                </div>
 
             </v-col>
             <v-col class="py-2" cols="6">
                 <MapComponent :initialCoordinates="model.geocoordinates" :label="model.naam"
                     v-model="model.geocoordinates" :readOnly="true" v-if="model.geocoordinates" />
-                    <v-btn prepend-icon="mdi-google-maps"
-                                            v-if="model.geocoordinates"
-                                            class="mb-2" :href="`https://www.google.com/maps/@${model.geocoordinates.lat},${model.geocoordinates.lng},16z`" target="_blank"	>Open locatie in Google Maps</v-btn>
+                <v-btn prepend-icon="mdi-google-maps" v-if="model.geocoordinates" class="mb-2"
+                    :href="`https://www.google.com/maps/@${model.geocoordinates.lat},${model.geocoordinates.lng},16z`"
+                    target="_blank">Open locatie in Google Maps</v-btn>
             </v-col>
         </v-row>
         <v-row>
@@ -56,7 +56,7 @@
         <v-row>
             <v-col class="py-2" cols="12">IkOokjes</v-col>
         </v-row>
-        
+
     </v-container>
 </template>
 
