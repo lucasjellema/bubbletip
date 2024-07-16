@@ -1,10 +1,7 @@
 <template>
-
-    {{ model }}
     <v-container class="mb-0 mt-1" fluid>
         <v-row>
             <v-col class="py-2" cols="12">
-                <p>Type Tip</p>
                 <v-btn-toggle v-model="model.tipType" mandatory color="deep-purple-accent-3">
                     <v-btn value="verblijf" title="Overnachtingsplek - hotel, camping, appartement, ...">
                         <v-icon start>
@@ -70,32 +67,109 @@
 
             </v-col>
         </v-row>
+        <v-row>
+            <v-col class="py-2" cols="11">
+                <v-expansion-panels :multiple="true">
+                    <v-expansion-panel title="Plek" collapse-icon="mdi-map-marker" expand-icon="mdi-map-marker"
+                        @click="handlePanelChange">
+                        <v-expansion-panel-text>
+                            <v-container class="mb-0 mt-1" fluid>
+                                <v-row>
+                                    <v-col class="py-2" cols="6">
+
+                                        <p>Klik op de kaart om de locatie aan te geven van jouw tip. Je kunt de marker
+                                            verplaatsen of
+                                            een nieuwe
+                                            plaatsen.</p>
+                                        <MapComponent :initialCoordinates="model.geocoordinates" :label="model.naam"
+                                            v-model="model.geocoordinates" @update:coordinates="updateCoordinates"
+                                            :coordinates="model.geocoordinates" :adjust="adjust"/> <!-- adjust is used only to alert the map component to the fact that the panel was expanded or collapsed (and therefore should invalidate the mapsize) -->
+
+                                        <v-btn @click="refreshLocationDetailsThroughGeocoder()"
+                                            title="Gebruik geodecoding om adresgegevens op te halen op basis van geocoordinaten"
+                                            v-if="model.geocoordinates != null && model.geocoordinates.lat && model.geocoordinates.lng">
+                                            <v-icon start>
+                                                mdi-map-marker-down
+                                            </v-icon>
+                                            <span class="hidden-sm-and-down">Haal adresgegevens op op basis van
+                                                geocoordinaten</span>
+                                        </v-btn>
+
+
+                                    </v-col><v-col cols="6">
+
+                                        <v-container class="mb-0 mt-1" fluid>
+                                            <v-row>
+                                                <v-col class="py-2" cols="11">
+                                                    <v-text-field label="Adres" v-model="model.adresgegevens"
+                                                        hint="Straat, huisnummer, postcode, stad, land"></v-text-field>
+                                                </v-col>
+                                            </v-row>
+                                            <v-row>
+                                                <v-col cols="5">
+                                                    <v-text-field label="Straat" v-model="model.straat"></v-text-field>
+                                                </v-col>
+                                                <v-col cols="2">
+                                                    <v-text-field label="Nummer"
+                                                        v-model="model.huisnummer"></v-text-field>
+                                                </v-col>
+                                                <v-col cols="4">
+                                                    <v-text-field label="Wijk" v-model="model.wijk"></v-text-field>
+                                                </v-col>
+                                            </v-row>
+                                            <v-row>
+                                                <v-col cols="2">
+                                                    <v-text-field label="Postcode"
+                                                        v-model="model.postcode"></v-text-field>
+                                                </v-col>
+                                                <v-col cols="4">
+                                                    <v-text-field label="Stad" v-model="model.stad"></v-text-field>
+                                                </v-col>
+                                                <v-col cols="5">
+                                                    <v-text-field label="Land" v-model="model.land"></v-text-field>
+                                                </v-col>
+                                            </v-row>
+                                        </v-container>
+                                    </v-col>
+                                </v-row>
+                            </v-container>
+                        </v-expansion-panel-text>
+                    </v-expansion-panel>
+                </v-expansion-panels>
+            </v-col>
+        </v-row>
 
         <v-row>
             <v-col class="py-2" cols="6">
                 <h3>Foto's </h3>
-                <v-data-table :headers="imageHeaders" :items="model.images" :items-per-page="5" class="elevation-1">
-                    <template v-slot:item.imageURL="{ item }">
-                        {{ item.imageLabel }} <p v-if="item.exifData?.dateTimeOriginal">gemaakt op {{ formatDate(new
-                            Date(item.exifData.dateTimeOriginal)) }}</p>
-                        <v-img :src="item.imageURL" aspect-ratio="1.7" height="200" v-if="item.imageURL"></v-img>
-                        <v-img :src="item.imageBase64" aspect-ratio="1.7" height="200" v-if="item.imageBase64"></v-img>
-                        <v-btn prepend-icon="mdi-map-marker-radius"
-                            title="Gebruik de GPS info in de foto om de geocoordinaten voor de kaart te bepalen "
-                            @click="defineTipCoordinatesFromEXIFGPS(item)" v-if="item.exifData?.gpsInfo?.latitude">Zet
-                            marker op de
-                            kaart</v-btn>
-
+                <v-data-table :headers="imageHeaders" :items="model.images" :items-per-page="5"
+                    class="elevation-1 mb-4">
+                    <template v-slot:item.imageURL="{ item, index }">
+                        <v-text-field label="Beschrijving" v-model="item.imageLabel" class="mt-2" </v-text-field>
+                            <p v-if="item.exifData?.dateTimeOriginal">gemaakt op {{ formatDate(new
+                                Date(item.exifData.dateTimeOriginal)) }}</p>
+                            <v-img :src="item.imageURL" aspect-ratio="1.7" height="200" v-if="item.imageURL"></v-img>
+                            <v-img :src="item.imageBase64" aspect-ratio="1.7" height="200"
+                                v-if="item.imageBase64"></v-img>
+                            <v-btn prepend-icon="mdi-map-marker-radius"
+                                title="Gebruik de GPS info in de foto om de geocoordinaten voor de kaart te bepalen "
+                                @click="defineTipCoordinatesFromEXIFGPS(item)"
+                                v-if="item.exifData?.gpsInfo?.latitude">Zet
+                                marker op de
+                                kaart</v-btn>
+                            <v-btn title="Verwijder deze foto" @click="removeImage(item, index)"
+                                prepend-icon="mdi-delete" class="mb-2">Verwijder foto</v-btn>
+                            <br />
                     </template>
                 </v-data-table>
-
+                <h3>Voeg foto toe</h3>
                 <div @paste.prevent="handlePaste">
                     <v-text-field label="URL van plaatje op internet" class="mb-2" v-model="imageURL"></v-text-field>
                     <v-file-input v-model="uploadedImageFile" label="Upload een Foto" accept="image/*"
                         @change="previewImage"></v-file-input>
                     <v-text-field label="Beschrijving" class="mb-2" v-model="imageLabel"></v-text-field>
                 </div>
-                <v-btn title="Voeg image toe" @click="addImage()">Voeg image toe</v-btn>
+                <v-btn title="Voeg image toe" @click="addImage()">Voeg foto toe</v-btn>
             </v-col>
             <v-col class="py-2" cols="4">
                 <v-img :src="imageURL" aspect-ratio="1.7" ref="newImage"></v-img>
@@ -111,6 +185,7 @@
 <script setup>
 // import { QuillEditor } from '@vueup/vue-quill'
 // import '@vueup/vue-quill/dist/vue-quill.snow.css';
+import { nextTick } from 'vue'
 import { useDateLibrary } from '@/composables/useDateLibrary';
 const { formatDate, months } = useDateLibrary();
 import { useGeoLibrary } from '@/composables/useGeoLibrary';
@@ -198,4 +273,16 @@ const isValidImageUrl = (url) => {
     return url.match(/\.(jpeg|jpg|gif|png)$/i) != null;
 }
 
+const removeImage = (item, index) => {
+    model.value.images.splice(index, 1)
+}
+
+const adjust = ref(0)
+const handlePanelChange = (isOpen) => {
+    if (isOpen) {
+        nextTick(() => {
+            adjust.value++
+        })
+    }
+}
 </script>

@@ -1,10 +1,6 @@
 <template>
     <div>
-        <p v-if="!readOnly">Klik op de kaart om de locatie aan te geven van jouw tip. Je kunt de marker verplaatsen of
-            een nieuwe
-            plaatsen.</p>
         <div id="map" style="height: 500px;"></div>
-        <p v-if="!readOnly">Je kunt de adresgegevens voor de tip opvragen als je de marker hebt geplaatst.</p>
     </div>
 </template>
 <script setup>
@@ -30,6 +26,14 @@ const props = defineProps({
     readOnly: {
         type: Boolean,
         default: false
+    },
+    zoomLevel: {
+        type: Number,
+        default: 13
+    },
+    adjust: {
+        type: Number,
+        default: -1
     }
 })
 onMounted(() => {
@@ -47,9 +51,23 @@ watch(() => props.coordinates
         replaceMarker(newValue.lat, newValue.lng)
 )
 
+watch(() => props.zoomLevel
+    , (newValue, oldValue) =>
+        map.setZoom(newValue)
+)
+
+watch(() => props.adjust
+    , (newValue, oldValue) => {
+        map.invalidateSize()
+        if (props.initialCoordinates.lat && props.initialCoordinates.lng) {
+            replaceMarker(props.initialCoordinates.lat, props.initialCoordinates.lng)
+        }
+    }
+)
+
 const initMap = () => {
     // Initialize the map
-    map = L.map('map').setView([props.initialCoordinates.lat, props.initialCoordinates.lng], 13);
+    map = L.map('map').setView([props.initialCoordinates.lat, props.initialCoordinates.lng], props.zoomLevel);
 
     // Set up the OSM layer
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -57,38 +75,25 @@ const initMap = () => {
     }).addTo(map);
 
     // Add initial marker if coordinates are provided
-    marker = L.marker([props.initialCoordinates.lat, props.initialCoordinates.lng], {
-        draggable: !props.readOnly
-    }).addTo(map).bindPopup(props.label).openPopup();
-
-    if (!props.readOnly) {
-
-
-        // Event listener for marker drag
-        marker.on('dragend', onMarkerDrag);
-
-        // Event listener for map click
-        map.on('click', onMapClick);
+    if (props.initialCoordinates.lat && props.initialCoordinates.lng) {
+        replaceMarker(props.initialCoordinates.lat, props.initialCoordinates.lng)
     }
 }
+
 const onMarkerDrag = (event) => {
     const position = event.target.getLatLng();
     emit('update:coordinates', { lat: position.lat, lng: position.lng });
 }
 
 const replaceMarker = (lat, lng) => {
-
     if (marker) {
         map.removeLayer(marker);
     }
     marker = L.marker([lat, lng], {
         draggable: true
     }).addTo(map).bindPopup(props.label).openPopup();
-
     // Event listener for marker drag
     marker.on('dragend', onMarkerDrag);
-
-
 }
 
 const onMapClick = (event) => {
