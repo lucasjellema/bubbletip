@@ -131,6 +131,7 @@ const tipTags = ref(new Set(['museum','pizza','ijs','kasteel','camping','kleuter
         image.imageURL = preAuthenticatedRequestURL.value + 'images/' + image.id + '.jpg'
         image.imageFile = null
         image.imageBase64 = null
+        image.uploaded = true
       }
 
     }
@@ -138,6 +139,8 @@ const tipTags = ref(new Set(['museum','pizza','ijs','kasteel','camping','kleuter
     if (tip.id) {
       const index = bubbleJSON.value.tips.findIndex(t => t.id === tip.id)
       if (index > -1) {
+// TODO any previously uploaded image for this tip that is no longer used should be removed from bucket (i.e. overwritten with empty file) 
+
         bubbleJSON.value.tips[index] = tip
       } else {
         // weird: id is set but tip is not found. TODO error
@@ -161,7 +164,7 @@ const tipTags = ref(new Set(['museum','pizza','ijs','kasteel','camping','kleuter
     }
     // create entries for tips
     for (const tip of bubbleJSON.value.tips) {
-      recent.push({ type: 'tip', label: tip.naam, datum: tip.aanmaakdatum, details: tip.tipType + ' ' + tip.adresgegevens, id: tip.id })
+      recent.push({ type: 'tip', label: tip.naam, datum: (tip.bewerkdatum??tip.aanmaakdatum), details: tip.tipType + ' ' + tip.adresgegevens, id: tip.id })
     }
     // TODO gevraagde tips, ikookjes
 
