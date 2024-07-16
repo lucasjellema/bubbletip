@@ -262,7 +262,7 @@ const handlePaste = async (event) => {
             if (items[i].type.indexOf("text") !== -1) {
                 const text = (event.clipboardData || window.clipboardData).getData('text');
                 if (isValidImageUrl(text)) { // Implement isValidImageUrl according to your needs
-                    imageUrl.value = text
+                    imageURL.value = text
                 }
             }
         }
