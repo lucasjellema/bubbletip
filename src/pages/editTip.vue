@@ -9,6 +9,8 @@ import { useAppStore } from "@/stores/app";
 import { useRoute } from 'vue-router';
 
 const route = useRoute();
+
+const router = useRouter()
 const tipId = route.params.tipId;
 
 const appStore = useAppStore()
@@ -26,6 +28,7 @@ onMounted(() => {
 const saveTip = () => {
  tip.value.bewerkdatum = new Date()
   appStore.saveTip(tip.value)
+  router.push({ name: 'tip', params: { tipId: tip.value.id } });
 }
 
 </script>
