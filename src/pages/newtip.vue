@@ -11,19 +11,19 @@ import { useRoute } from 'vue-router';
 const router = useRouter()
 
 
-const tip = ref({wanneer :{maand:null,jaar:null}, images : []})
+const tip = ref({wanneer :{maand:null,jaar:null}, images : [], tag:[]})
 onMounted(() => {
 })
 
 const saveTip = () => {
-  const tip = {
+  const newTip = {
     tipType: tip.value.tipType, tipGever: appStore.ingechecktLid.gebruikersnaam, aanmaakdatum: new Date(), naam: tip.value.naam.value
     , adresgegevens: tip.value.adresgegevens, straat: tip.value.straat, postcode: tip.value.postcode, wijk: tip.value.wijk, huisnummer: tip.value.huisnummer, land: tip.value.land, stad: tip.value.stad,
     website: tip.value.website, beschrijving: tip.value.beschrijving, geocoordinates: tip.value.geocoordinates, tags: tip.value.tags, wanneer: tip.value.wanneer 
     , methoeveel: tip.value.methoeveel, metwie: tip.value.metwie, beoordeling: tip.value.beoordeling, images: tip.value.images
   }
-  appStore.saveTip(tip)
-  router.push({ name: 'tip', params: { tipId: tip.value.id } });
+  appStore.saveTip(newTip)
+  router.push({ name: 'tip', params: { tipId: newTip.id } });
 
 }
 
