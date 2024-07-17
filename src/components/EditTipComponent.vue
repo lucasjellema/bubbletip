@@ -273,7 +273,9 @@ const handleLocationPaste = async (event) => {
                     const longitude = parseFloat(coordinates[1]);
                     const latitude = parseFloat(coordinates[0]);
                     updateCoordinates({ lat: latitude, lng: longitude })
-                    refreshLocationDetailsThroughGeocoder() 
+                    nextTick(() => {
+                        refreshLocationDetailsThroughGeocoder()                         
+                    })
                 } else {
                     event.target.value = text;
                 }
