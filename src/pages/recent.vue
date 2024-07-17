@@ -1,13 +1,17 @@
 <template>
-  <h1>Recente Tips, IkOokjes, Leden en Tip Verzoeken</h1>
+  <h1>Recente Tips en Nieuwe Leden</h1>
 
   <v-data-table :headers="recentHeaders" :items="recentItems" item-key="gebruikersnaam" class="elevation-1">
 
     <template v-slot:item.type="{ item, index }">
       <v-btn @click="gotoItem(item)" text>Details</v-btn>
-      <v-icon>{{ item.type === 'tip' ? 'mdi-star-plus-outline' : 'mdi-account' }}
+      <v-icon>{{ item.type === 'tip' ? 'mdi-star-plus-outline' : 'mdi-account' }}</v-icon>
+      <v-icon v-if="item.type === 'tip'">
+        {{ item.tipType === 'verblijf' ? 'mdi-bed' :(item.tipType === 'restaurant' ? 'mdi-silverware-fork-knife' :'mdi-walk') }}
       </v-icon>
+      
     </template>
+
     <template v-slot:item.datum="{ item, index }">
       {{ formatDate(item.datum) }}
     </template>
