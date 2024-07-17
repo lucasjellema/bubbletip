@@ -119,6 +119,14 @@ const tipTags = ref(new Set(['museum','pizza','ijs','kasteel','camping','kleuter
     bubbleChanged()
     return lid
   }
+
+  const removeTip = (tipId) => {
+    const index = bubbleJSON.value.tips.findIndex(t => t.id === tipId)
+    if (index > -1) {
+      bubbleJSON.value.tips.splice(index, 1)
+      bubbleChanged()
+    }
+  }
   const saveTip = (tip) => {
     // any image that does not have an id should be processed
     // loop over tip.images
@@ -149,11 +157,16 @@ const tipTags = ref(new Set(['museum','pizza','ijs','kasteel','camping','kleuter
       tip.id = new Date().getTime()
       bubbleJSON.value.tips.push(tip)
     }
+    try {
     for (const tag of tip.tags) {
       tipTags.value.add(tag)
     }
+    } catch (error) {
+      console.log(error)
+    }
 
     bubbleChanged()
+    return tip
   }
 
   const getRecent = () => {
@@ -181,6 +194,6 @@ const tipTags = ref(new Set(['museum','pizza','ijs','kasteel','camping','kleuter
   }
 
   return {
-    setPAR, getBubble, ingechecktLid, saveLid, saveTip, getRecent, saveIncident, tipTags
+    setPAR, getBubble, ingechecktLid, saveLid, saveTip, removeTip, getRecent, saveIncident, tipTags
   }
 })

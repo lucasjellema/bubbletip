@@ -6,6 +6,8 @@
             <v-col class="py-2" cols="12">
                 <v-btn @click="gotoEditTip()" v-if="model.tipGever = appStore.ingechecktLid?.gebruikersnaam">Bewerk
                     Tip</v-btn>
+                    <v-btn @click="deleteTip()" v-if="model.tipGever = appStore.ingechecktLid?.gebruikersnaam">Verwijder
+                        Tip</v-btn>
                 <h2 class="mr-4"><v-icon start>{{ tipTypeIconMap[model.tipType] }}</v-icon>{{ model.naam }}</h2>
                 <i>Getipt door {{ model.tipGever }} op {{ formatDate(model.aanmaakdatum) }} </i>
             </v-col>
@@ -89,6 +91,11 @@ const imageHeaders = [
 
 const gotoEditTip = () => {
     router.push({ name: 'editTip', params: { tipId: model.id } });
+}
+
+const deleteTip= () => {
+    appStore.removeTip(model.value.id)
+    router.push({ name: 'intro' })
 }
 
 </script>
