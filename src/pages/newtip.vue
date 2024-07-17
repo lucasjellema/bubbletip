@@ -7,6 +7,9 @@
 <script setup>
 import { useAppStore } from "@/stores/app";
 const appStore = useAppStore()
+import { useRoute } from 'vue-router';
+const router = useRouter()
+
 
 const tip = ref({wanneer :{maand:null,jaar:null}, images : []})
 onMounted(() => {
@@ -20,6 +23,8 @@ const saveTip = () => {
     , methoeveel: tip.value.methoeveel, metwie: tip.value.metwie, beoordeling: tip.value.beoordeling, images: tip.value.images
   }
   appStore.saveTip(tip)
+  router.push({ name: 'tip', params: { tipId: tip.value.id } });
+
 }
 
 const handleTagChange = (newValue) => {
