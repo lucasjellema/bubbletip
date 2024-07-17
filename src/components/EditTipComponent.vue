@@ -83,7 +83,8 @@
                                             plaatsen.</p>
                                         <MapComponent :initialCoordinates="model.geocoordinates" :label="model.naam"
                                             v-model="model.geocoordinates" @update:coordinates="updateCoordinates"
-                                            :coordinates="model.geocoordinates" :adjust="adjust"/> <!-- adjust is used only to alert the map component to the fact that the panel was expanded or collapsed (and therefore should invalidate the mapsize) -->
+                                            :coordinates="model.geocoordinates" :adjust="adjust" />
+                                        <!-- adjust is used only to alert the map component to the fact that the panel was expanded or collapsed (and therefore should invalidate the mapsize) -->
 
                                         <v-btn @click="refreshLocationDetailsThroughGeocoder()"
                                             title="Gebruik geodecoding om adresgegevens op te halen op basis van geocoordinaten"
@@ -98,7 +99,7 @@
 
                                     </v-col><v-col cols="6">
 
-                                        <v-container class="mb-0 mt-1" fluid>
+                                        <v-container class="mb-0 mt-1" fluid @paste.prevent="handleLocationPaste">
                                             <v-row>
                                                 <v-col class="py-2" cols="11">
                                                     <v-text-field label="Adres" v-model="model.adresgegevens"
@@ -163,7 +164,7 @@
                     </template>
                 </v-data-table>
                 <h3>Voeg foto toe</h3>
-                <div @paste.prevent="handlePaste">
+                <div @paste.prevent="handleImagePaste">
                     <v-text-field label="URL van plaatje op internet" class="mb-2" v-model="imageURL"></v-text-field>
                     <v-file-input v-model="uploadedImageFile" label="Upload een Foto" accept="image/*"
                         @change="previewImage"></v-file-input>
@@ -185,11 +186,11 @@
 <script setup>
 // import { QuillEditor } from '@vueup/vue-quill'
 // import '@vueup/vue-quill/dist/vue-quill.snow.css';
-import { nextTick } from 'vue'
+import { nextTick, onMounted } from 'vue'
 import { useDateLibrary } from '@/composables/useDateLibrary';
 const { formatDate, months } = useDateLibrary();
 import { useGeoLibrary } from '@/composables/useGeoLibrary';
-const { reverseGeocode, extractEXIFData } = useGeoLibrary();
+const { reverseGeocode, extractEXIFData,isValidCoordinateFormat } = useGeoLibrary();
 
 import { useAppStore } from "@/stores/app";
 
@@ -197,6 +198,14 @@ const appStore = useAppStore()
 const bubble = appStore.getBubble()
 const model = defineModel()
 const tipTags = appStore.tipTags
+
+onMounted(() => {
+    if (!model.value.maand) { model.value.maand = model.value.wanneer?.maand }
+    if (!model.value.jaar) { model.value.jaar = model.value.wanneer?.jaar }
+    if (!model.value.wanneer.maand) { model.value.maand = model.value.maand }
+    if (!model.value.wanneer.jaar) { model.value.jaar = model.value.jaar }
+
+})
 const handleTagChange = (newValue) => {
     // Handle the change event
     // This is where you might want to add logic to update the list of tags
@@ -247,72 +256,97 @@ const previewImage = async () => {
 const updateCoordinates = (newCoordinates) => {
     nextTick(() => {
         model.value.geocoordinates = newCoordinates;
-        
+
     })
 }
-const handlePaste = async (event) => {
+
+const handleLocationPaste = async (event) => {
 
     if (event.clipboardData?.items) {
         const items = event.clipboardData.items;
         for (let i = 0; i < items.length; i++) {
-            // Check if the item is an image
-            if (items[i].type.indexOf("image") !== -1) {
-                const file = items[i].getAsFile();
-                //    uploadedImage.value = file
-                uploadedImageFile.value = file
-                previewImage()
-            }
-
-            // if item is a string that is a valid URL - set the imageUrl property 
-            // 
             if (items[i].type.indexOf("text") !== -1) {
                 const text = (event.clipboardData || window.clipboardData).getData('text');
-                if (isValidImageUrl(text)) { // Implement isValidImageUrl according to your needs
-                    imageURL.value = text
+                if (isValidCoordinateFormat(text)) {
+                    console.log(`looks like coordinates`)
+                    const coordinates = text.split(',');
+                    const longitude = parseFloat(coordinates[1]);
+                    const latitude = parseFloat(coordinates[0]);
+                    updateCoordinates({ lat: latitude, lng: longitude })
+                    refreshLocationDetailsThroughGeocoder() 
+                } else {
+                    event.target.value = text;
                 }
             }
         }
     }
 }
 
-const isValidImageUrl = (url) => {
-    return url.match(/\.(jpeg|jpg|gif|png)$/i) != null;
-}
 
-const removeImage = (item, index) => {
-    model.value.images.splice(index, 1)
-}
 
-const adjust = ref(0)
-const handlePanelChange = (isOpen) => {
-    if (isOpen) {
-        nextTick(() => {
-            adjust.value++
-        })
+    const handleImagePaste = async (event) => {
+
+        if (event.clipboardData?.items) {
+            const items = event.clipboardData.items;
+            for (let i = 0; i < items.length; i++) {
+                // Check if the item is an image
+                if (items[i].type.indexOf("image") !== -1) {
+                    const file = items[i].getAsFile();
+                    //    uploadedImage.value = file
+                    uploadedImageFile.value = file
+                    previewImage()
+                }
+
+                // if item is a string that is a valid URL - set the imageUrl property 
+                // 
+                if (items[i].type.indexOf("text") !== -1) {
+                    const text = (event.clipboardData || window.clipboardData).getData('text');
+                    if (isValidImageUrl(text)) { // Implement isValidImageUrl according to your needs
+                        imageURL.value = text
+                    }
+                }
+            }
+        }
     }
-}
 
-const refreshLocationDetailsThroughGeocoder = async () => {
-  const coordinates = model.value.geocoordinates
-  if (coordinates != null && coordinates.lat && coordinates.lng) {
-    const locationDetails = await reverseGeocode(coordinates.lng, coordinates.lat)
-    model.value.adresgegevens= locationDetails.address
-    model.value.naam= locationDetails.label
-    model.value.land= locationDetails.country
-    model.value.straat= locationDetails.street
-    model.value.stad= locationDetails.city
-    model.value.postcode= locationDetails.postcode
-    model.value.wijk= locationDetails.quarter
-    model.value.huisnummer= locationDetails.house_number
-  }
-}
-
-const defineTipCoordinatesFromEXIFGPS = (item) => {
-  if (item.exifData && item.exifData.gpsInfo.latitude && item.exifData.gpsInfo.longitude) {
-    model.value.geocoordinates = {
-      lat: item.exifData.gpsInfo.latitude,
-      lng: item.exifData.gpsInfo.longitude
+    const isValidImageUrl = (url) => {
+        return url.match(/\.(jpeg|jpg|gif|png)$/i) != null;
     }
-  }
-}
+
+    const removeImage = (item, index) => {
+        model.value.images.splice(index, 1)
+    }
+
+    const adjust = ref(0)
+    const handlePanelChange = (isOpen) => {
+        if (isOpen) {
+            nextTick(() => {
+                adjust.value++
+            })
+        }
+    }
+
+    const refreshLocationDetailsThroughGeocoder = async () => {
+        const coordinates = model.value.geocoordinates
+        if (coordinates != null && coordinates.lat && coordinates.lng) {
+            const locationDetails = await reverseGeocode(coordinates.lng, coordinates.lat)
+            model.value.adresgegevens = locationDetails.address
+            model.value.naam = locationDetails.label
+            model.value.land = locationDetails.country
+            model.value.straat = locationDetails.street
+            model.value.stad = locationDetails.city
+            model.value.postcode = locationDetails.postcode
+            model.value.wijk = locationDetails.quarter
+            model.value.huisnummer = locationDetails.house_number
+        }
+    }
+
+    const defineTipCoordinatesFromEXIFGPS = (item) => {
+        if (item.exifData && item.exifData.gpsInfo.latitude && item.exifData.gpsInfo.longitude) {
+            model.value.geocoordinates = {
+                lat: item.exifData.gpsInfo.latitude,
+                lng: item.exifData.gpsInfo.longitude
+            }
+        }
+    }
 </script>

@@ -2,7 +2,11 @@ import exifr from 'exifr';
 
 export function useGeoLibrary() {
 
-
+    function isValidCoordinateFormat(str) {
+        // Regular expression for matching coordinates with at least one decimal digit
+        const regex = /^-?\d+\.\d+, -?\d+\.\d+$/;
+        return regex.test(str);
+      }
     const extractEXIFData = async (imageFile) => {
         return new Promise(async (resolve, reject) => {
             try {
@@ -69,5 +73,5 @@ export function useGeoLibrary() {
                 .catch(error => { console.error('Error in reverseGeocode:', error); reject(error) });
         });
     }
-    return { reverseGeocode,extractEXIFData };
+    return { reverseGeocode,extractEXIFData,isValidCoordinateFormat };
 }

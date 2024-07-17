@@ -16,7 +16,7 @@
                 <p v-if="model.website">Website: <a :href="model.website" target="_blank">{{ model.website }}</a></p>
                 <br /><br />
                 <h3>Beschrijving en Ervaring</h3>
-                <i v-if="model.jaar">(beleefd in {{ months.find(m => m.id == model.maand).name }} {{ model.jaar }})</i>
+                <i v-if="model.jaar">(beleefd in {{ months.find(m => m.id == model.maand)?.name }} {{ model.jaar }})</i>
                 <v-sheet class="flex-1-1-100  ma-0 pa-0 mb-3">
                     {{ model.beschrijving }}
                     <!-- <ErrorBoundary>
