@@ -164,7 +164,7 @@ const tipTags = ref(new Set(['museum','pizza','ijs','kasteel','camping','kleuter
     }
     // create entries for tips
     for (const tip of bubbleJSON.value.tips) {
-      recent.push({ type: 'tip', label: tip.naam, datum: (tip.bewerkdatum??tip.aanmaakdatum), details: tip.tipType + ' ' + tip.adresgegevens, id: tip.id })
+      recent.push({ type: 'tip',tipType: tip.tipType, label: tip.naam, datum: (tip.bewerkdatum??tip.aanmaakdatum), details: tip.tipType + ' ' + tip.adresgegevens, id: tip.id })
     }
     // TODO gevraagde tips, ikookjes
 
