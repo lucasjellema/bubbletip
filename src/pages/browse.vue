@@ -4,6 +4,7 @@
     <v-row>
       <v-col>
         <v-text-field label="Zoeken..." v-model="search"></v-text-field>
+        <MapMarkersComponent :tips="filteredTips" :adjust="adjust" @boxed="handleBoxed"></MapMarkersComponent>
       </v-col>
       <v-col>
         <v-card-text>
@@ -36,12 +37,16 @@
         <v-data-table :headers="tipHeaders" :items="filteredTips" class="elevation-1">
 
           <template v-slot:item.tipType="{ item, index }">
-            <v-btn @click="gotoItem(item)" text>Details</v-btn>
+            <!-- <v-btn @click="gotoItem(item)" text>Details</v-btn> -->
+            <v-btn @click="() => { tipId = item.id; tipDialog = true }" text>Details</v-btn>
 
-            <v-icon >
+            <v-icon>
               {{ item.tipType === 'verblijf' ? 'mdi-bed' : (item.tipType === 'restaurant' ? 'mdi-silverware-fork-knife'
                 : 'mdi-walk') }}
             </v-icon>
+          </template>
+          <template v-slot:item.plek="{ item, index }">
+            <span>{{ item.stad }}, {{ item.land }}</span>
 
           </template>
 
@@ -55,10 +60,16 @@
 
   </v-container>
   <v-dialog v-model="tipDialog">
-    <TipComponent :tipId="tipId" @close="tipDialog=false"></TipComponent>
-    </v-dialog>
+    <v-card title="Tip Details">
+      <v-toolbar>
+        <v-btn icon="mdi-close" @click="tipDialog = false"></v-btn>
+      </v-toolbar>
+      <template v-slot:text>
+        <TipComponent v-model="selectedTip" @close="tipDialog = false"></TipComponent>
+      </template>
+    </v-card>
+  </v-dialog>
 
-  {{ tips }}
 </template>
 
 <script setup>
@@ -75,23 +86,32 @@ const filterTags = ref([])
 const filterTipTypes = ref([])
 const filterCountries = ref([])
 import { useDateLibrary } from '@/composables/useDateLibrary';
+import MapMarkersComponent from "@/components/MapMarkersComponent .vue";
 const { formatDate } = useDateLibrary();
 const countries = ref([])
 
 const tipDialog = ref(false)
 const tipId = ref(0)
 
+const selectedTip = computed(() =>
+  tips.value.find(tip => tip.id === tipId.value)
+)
+
+const adjust = ref(0)
+
 
 const tipHeaders = ref([
   { title: 'Type', key: 'tipType' },
-  { title: 'Datum', key: 'aanmaakdatum' },
-  { title: 'Label', key: 'naam' },
+  { title: 'Naam', key: 'naam' },
+  { title: 'Plek', key: 'plek' },
   { title: 'Tipper', key: 'tipGever' },
+  { title: 'Datum', key: 'aanmaakdatum' },
 
 ])
 const tips = ref([])
 const filteredTips = ref([])
 const search = ref('')
+const geobounds = ref(null)
 
 const filter = () => {
   filteredTips.value = tips.value
@@ -111,16 +131,25 @@ const filter = () => {
     const countriesToFilterOn = filterCountries.value.map(tag => countries.value[tag])
     filteredTips.value = filteredTips.value.filter((tip) => countriesToFilterOn.includes(tip.land))
   }
-
+  if (geobounds.value !== null) {
+    filteredTips.value = filteredTips.value.filter((tip) => {
+      return geobounds.value.contains(tip.geocoordinates)
+    })
+  }
 }
 
 watch(search, () => {
   filter()
 })
 
-watch([filterTags,filterTipTypes, filterCountries], () => {
+watch([filterTags, filterTipTypes, filterCountries], () => {
   filter()
 })
+
+const handleBoxed = (bounds) => {
+  geobounds.value = bounds
+  filter()
+}
 
 
 onMounted(() => {
@@ -129,5 +158,5 @@ onMounted(() => {
   filter()
 })
 const gotoItem = (item) => {
-    router.push({ name: 'tip', params: { tipId: item.id } });
+  router.push({ name: 'tip', params: { tipId: item.id } });
 }</script>
