@@ -48,8 +48,8 @@
                                         <v-btn prepend-icon="mdi-star-plus-outline" title="Voeg een tip toe"
                                             class="mb-2" to="/newtip" v-if="appStore.ingechecktLid != null">Nieuwe
                                             Tip</v-btn>
-                                        <v-btn prepend-icon="mdi-map-search" title="Bekijk tips op de kaart"
-                                            class="mb-2" to="/map">Bekijk Kaart</v-btn>
+                                        <!-- <v-btn prepend-icon="mdi-map-search" title="Bekijk tips op de kaart"
+                                            class="mb-2" to="/map">Bekijk Kaart</v-btn> -->
                                         <v-btn prepend-icon="mdi-book-search-outline" title="Zoek en Blader door tips"
                                             to="/browse" class="mb-2">Zoek en Blader</v-btn>
                                         <v-btn prepend-icon="mdi-clock-fast"
