@@ -4,9 +4,9 @@
     <v-container fluid>
         <v-row>
             <v-col class="py-2" cols="12">
-                <v-btn @click="gotoEditTip()" v-if="model.tipGever = appStore.ingechecktLid?.gebruikersnaam">Bewerk
+                <v-btn @click="gotoEditTip()" v-if="model.tipGever == appStore.ingechecktLid?.gebruikersnaam">Bewerk
                     Tip</v-btn>
-                    <v-btn @click="deleteTip()" v-if="model.tipGever = appStore.ingechecktLid?.gebruikersnaam">Verwijder
+                    <v-btn @click="deleteTip()" v-if="model.tipGever == appStore.ingechecktLid?.gebruikersnaam">Verwijder
                         Tip</v-btn>
                 <h2 class="mr-4"><v-icon start>{{ tipTypeIconMap[model.tipType] }}</v-icon>{{ model.naam }}</h2>
                 <i>Getipt door {{ model.tipGever }} op {{ formatDate(model.aanmaakdatum) }} </i>
@@ -90,7 +90,7 @@ const imageHeaders = [
 ]
 
 const gotoEditTip = () => {
-    router.push({ name: 'editTip', params: { tipId: model.id } });
+    router.push({ name: 'editTip', params: { tipId: model.value.id } });
 }
 
 const deleteTip= () => {
