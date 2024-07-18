@@ -65,14 +65,21 @@ watch(() => props.adjust
     }
 )
 
+let layerControl
 const initMap = () => {
     // Initialize the map
     map = L.map('map').setView([props.initialCoordinates.lat, props.initialCoordinates.lng], props.zoomLevel);
 
     // Set up the OSM layer
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: '© OpenStreetMap contributors'
+    const osmLayer = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
     }).addTo(map);
+    const EsriWorldImageryLayer = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+        attribution: 'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community'
+    });
+    // create control to switch between Open Street Map and Satellite
+    layerControl = L.control.layers({ OpenStreetMap: osmLayer, Satellite: EsriWorldImageryLayer }).addTo(map);
+
 
     // when the map is clicked
     map.on('click', onMapClick);
