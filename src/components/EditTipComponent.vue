@@ -47,23 +47,45 @@
                 <v-sheet class="flex-1-1-100  ma-0 pa-0 mb-3">
                     <v-textarea v-model="model.beschrijving" variant="outlined" rows="4"></v-textarea>
                     <!-- <QuillEditor theme="snow" toolbar="essential" v-model:content="model.beschrijving" contentType="delta" /> -->
+                    <!-- @update:model-value="handleSelectionUpdate" :custom-filter="customFilter"
+                     -->
                 </v-sheet>
-                <v-combobox v-model="model.tags" :items="Array.from(tipTags)" chips clearable deletable-chips multiple
-                    label="Voeg tags toe" append-icon="mdi-tag-plus" @change="handleTagChange"
-                    :menu-props="{ maxHeight: 'auto' }" class="ma-0 mt-5" </v-combobox>
-                    Wanneer was je er?
-                    <v-container class="mb-0 mt-1" fluid>
-                        <v-row>
-                            <v-col cols="7">
-                                <v-select :items="months" item-title="name" item-value="id" label="Welke Maand?"
-                                    outlined v-model="model.wanneer.maand"></v-select>
-                            </v-col>
-                            <v-col cols="5">
+                {{ filteredTags }}
+                <v-autocomplete clearable chips closable-chips v-model="selectedTags" :items="filteredTags" multiple
+                    item-title="name" item-value="name" auto-select-first hide-no-data hide-selected small-chips
+                    label="Voeg tags toe" append-icon="mdi-tag-plus" @blur="handleBlurOnTags"
+                    :custom-filter="customFilter" @update:model-value="handleSelectionUpdate" clear-on-select
+                    ref="autocompleteRef" class="ma-0 mt-5">
+                    <!-- selected items -->
+                    <template v-slot:chip="{ props, item }">
+                        <v-chip v-bind="props" :text="item.raw.name"></v-chip>
+                    </template> <!-- to select -->
+                    <template v-slot:item="{ props, item }">
+                        <v-chip v-bind="props" :text="item.raw.name" class="chippie"></v-chip>
+                    </template>
 
-                                <v-text-field label="In Welk Jaar" type="number" v-model="model.jaar" />
-                            </v-col>
-                        </v-row>
-                    </v-container>
+                </v-autocomplete>
+
+                MOdel:{{ model.tags }}
+                Selected:{{ selectedTags }}
+                <!-- <v-combobox v-model="model.tags" :items="Array.from(tipTags)" chips clearable deletable-chips multiple
+                    label="Voeg tags toe" append-icon="mdi-tag-plus" @change="handleTagChange"
+                    :menu-props="{ maxHeight: 'auto' }" class="ma-0 mt-5" </v-combobox> -->
+
+
+                Wanneer was je er?
+                <v-container class="mb-0 mt-1" fluid>
+                    <v-row>
+                        <v-col cols="7">
+                            <v-select :items="months" item-title="name" item-value="id" label="Welke Maand?" outlined
+                                v-model="model.maand"></v-select>
+                        </v-col>
+                        <v-col cols="5">
+
+                            <v-text-field label="In Welk Jaar" type="number" v-model="model.jaar" />
+                        </v-col>
+                    </v-row>
+                </v-container>
 
             </v-col>
         </v-row>
@@ -190,22 +212,91 @@ import { nextTick, onMounted } from 'vue'
 import { useDateLibrary } from '@/composables/useDateLibrary';
 const { formatDate, months } = useDateLibrary();
 import { useGeoLibrary } from '@/composables/useGeoLibrary';
-const { reverseGeocode, extractEXIFData,isValidCoordinateFormat } = useGeoLibrary();
+const { reverseGeocode, extractEXIFData, isValidCoordinateFormat } = useGeoLibrary();
 
 import { useAppStore } from "@/stores/app";
 
 const appStore = useAppStore()
 const bubble = appStore.getBubble()
 const model = defineModel()
-const tipTags = appStore.tipTags
+const tipTags = ref([])
+
+const selectedTags = ref([])
+const filteredTags = computed(() => {
+    const tagArray = Array.from(tipTags.value)
+    const tags = tagArray.map((tag) => {
+        return { name: tag }
+    })
+    return tags
+})
+
+
+const searchTagsField = ref('')
+const searchField = ref('')
+const autocompleteRef = ref(null)
+
+const handleBlurOnTags = (event) => {
+    console.log('blur, current search value on tags ', searchField.value)
+    if (searchField.value !== '' && !elementAdded) {
+
+        tipTags.value.find(element => element === searchField.value) === undefined ? tipTags.value.push(searchField.value) : console.log('value already exists in tipTags')
+        const tag = tipTags.value.find(element => element.name === searchField.value)
+        selectedTags.value.find(element => element === searchField.value) === undefined ? selectedTags.value.push( searchField.value ) : console.log('value already exists in model tags')
+        updateModelTags()
+
+        
+        console.log('add tag ', searchField.value)
+        searchTagsField.value = ''
+        searchField.value = ''
+        autocompleteRef.value.search = ''
+    }
+    elementAdded = false
+
+}
+const customFilter = (itemTitle, queryText, item) => {
+    //  console.log('custom filter ', itemTitle, queryText, item)
+    elementAdded = false
+    const textOne = item.raw.name.toLowerCase()
+    // const textTwo = item.raw.abbr.toLowerCase()
+    const searchText = queryText.toLowerCase()
+    searchField.value = queryText
+    return queryText.length > -1 && textOne.indexOf(searchText) > -1
+}
+
+let elementAdded = false
+const handleSelectionUpdate = (event) => {
+    elementAdded = true
+}
+
 
 onMounted(() => {
+    const m = model.value
     if (!model.value.maand) { model.value.maand = model.value.wanneer?.maand }
     if (!model.value.jaar) { model.value.jaar = model.value.wanneer?.jaar }
-    if (!model.value.wanneer.maand) { model.value.maand = model.value.maand }
-    if (!model.value.wanneer.jaar) { model.value.jaar = model.value.jaar }
+    if (!model.value.wanneer?.maand) { model.value.maand = model.value.maand }
+    if (!model.value.wanneer?.jaar) { model.value.jaar = model.value.jaar }
+    tipTags.value = [...appStore.tipTags]
+    selectedTags.value = model.value.tags.map((tag) => {
+        return tag
+    })
 
 })
+
+const updateModelTags = () => {
+    const tags = selectedTags.value.map((tag) => {
+        console.log('tag in new Value', tag)
+        return tag
+    })
+    model.value.tags = tags
+    console.log('model tags updated', model.value.tags)
+
+}
+
+watch(selectedTags, async (newTags, oldTags) => {
+updateModelTags()
+})
+
+
 const handleTagChange = (newValue) => {
     // Handle the change event
     // This is where you might want to add logic to update the list of tags
@@ -274,7 +365,7 @@ const handleLocationPaste = async (event) => {
                     const latitude = parseFloat(coordinates[0]);
                     updateCoordinates({ lat: latitude, lng: longitude })
                     nextTick(() => {
-                        refreshLocationDetailsThroughGeocoder()                         
+                        refreshLocationDetailsThroughGeocoder()
                     })
                 } else {
                     event.target.value = text;
@@ -286,69 +377,78 @@ const handleLocationPaste = async (event) => {
 
 
 
-    const handleImagePaste = async (event) => {
+const handleImagePaste = async (event) => {
 
-        if (event.clipboardData?.items) {
-            const items = event.clipboardData.items;
-            for (let i = 0; i < items.length; i++) {
-                // Check if the item is an image
-                if (items[i].type.indexOf("image") !== -1) {
-                    const file = items[i].getAsFile();
-                    //    uploadedImage.value = file
-                    uploadedImageFile.value = file
-                    previewImage()
-                }
+    if (event.clipboardData?.items) {
+        const items = event.clipboardData.items;
+        for (let i = 0; i < items.length; i++) {
+            // Check if the item is an image
+            if (items[i].type.indexOf("image") !== -1) {
+                const file = items[i].getAsFile();
+                //    uploadedImage.value = file
+                uploadedImageFile.value = file
+                previewImage()
+            }
 
-                // if item is a string that is a valid URL - set the imageUrl property 
-                // 
-                if (items[i].type.indexOf("text") !== -1) {
-                    const text = (event.clipboardData || window.clipboardData).getData('text');
-                    if (isValidImageUrl(text)) { // Implement isValidImageUrl according to your needs
-                        imageURL.value = text
-                    }
+            // if item is a string that is a valid URL - set the imageUrl property 
+            // 
+            if (items[i].type.indexOf("text") !== -1) {
+                const text = (event.clipboardData || window.clipboardData).getData('text');
+                if (isValidImageUrl(text)) { // Implement isValidImageUrl according to your needs
+                    imageURL.value = text
                 }
             }
         }
     }
+}
 
-    const isValidImageUrl = (url) => {
-        return url.match(/\.(jpeg|jpg|gif|png)$/i) != null;
+const isValidImageUrl = (url) => {
+    return url.match(/\.(jpeg|jpg|gif|png)$/i) != null;
+}
+
+const removeImage = (item, index) => {
+    model.value.images.splice(index, 1)
+}
+
+const adjust = ref(0)
+const handlePanelChange = (isOpen) => {
+    if (isOpen) {
+        nextTick(() => {
+            adjust.value++
+        })
     }
+}
 
-    const removeImage = (item, index) => {
-        model.value.images.splice(index, 1)
+const refreshLocationDetailsThroughGeocoder = async () => {
+    const coordinates = model.value.geocoordinates
+    if (coordinates != null && coordinates.lat && coordinates.lng) {
+        const locationDetails = await reverseGeocode(coordinates.lng, coordinates.lat)
+        model.value.adresgegevens = locationDetails.address
+        model.value.naam = locationDetails.label
+        model.value.land = locationDetails.country
+        model.value.straat = locationDetails.street
+        model.value.stad = locationDetails.city
+        model.value.postcode = locationDetails.postcode
+        model.value.wijk = locationDetails.quarter
+        model.value.huisnummer = locationDetails.house_number
     }
+}
 
-    const adjust = ref(0)
-    const handlePanelChange = (isOpen) => {
-        if (isOpen) {
-            nextTick(() => {
-                adjust.value++
-            })
+const defineTipCoordinatesFromEXIFGPS = (item) => {
+    if (item.exifData && item.exifData.gpsInfo.latitude && item.exifData.gpsInfo.longitude) {
+        model.value.geocoordinates = {
+            lat: item.exifData.gpsInfo.latitude,
+            lng: item.exifData.gpsInfo.longitude
         }
     }
+}
 
-    const refreshLocationDetailsThroughGeocoder = async () => {
-        const coordinates = model.value.geocoordinates
-        if (coordinates != null && coordinates.lat && coordinates.lng) {
-            const locationDetails = await reverseGeocode(coordinates.lng, coordinates.lat)
-            model.value.adresgegevens = locationDetails.address
-            model.value.naam = locationDetails.label
-            model.value.land = locationDetails.country
-            model.value.straat = locationDetails.street
-            model.value.stad = locationDetails.city
-            model.value.postcode = locationDetails.postcode
-            model.value.wijk = locationDetails.quarter
-            model.value.huisnummer = locationDetails.house_number
-        }
-    }
 
-    const defineTipCoordinatesFromEXIFGPS = (item) => {
-        if (item.exifData && item.exifData.gpsInfo.latitude && item.exifData.gpsInfo.longitude) {
-            model.value.geocoordinates = {
-                lat: item.exifData.gpsInfo.latitude,
-                lng: item.exifData.gpsInfo.longitude
-            }
-        }
-    }
 </script>
+<style scoped>
+.chippie {
+    flex: 1 0 auto;
+    margin: 4px;
+    background-color: yellow
+}
+</style>
