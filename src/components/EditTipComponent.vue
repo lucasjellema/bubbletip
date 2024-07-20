@@ -50,7 +50,7 @@
                     <!-- @update:model-value="handleSelectionUpdate" :custom-filter="customFilter"
                      -->
                 </v-sheet>
-                {{ filteredTags }}
+                
                 <v-autocomplete clearable chips closable-chips v-model="selectedTags" :items="filteredTags" multiple
                     item-title="name" item-value="name" auto-select-first hide-no-data hide-selected small-chips
                     label="Voeg tags toe" append-icon="mdi-tag-plus" @blur="handleBlurOnTags"
@@ -65,13 +65,6 @@
                     </template>
 
                 </v-autocomplete>
-
-                MOdel:{{ model.tags }}
-                Selected:{{ selectedTags }}
-                <!-- <v-combobox v-model="model.tags" :items="Array.from(tipTags)" chips clearable deletable-chips multiple
-                    label="Voeg tags toe" append-icon="mdi-tag-plus" @change="handleTagChange"
-                    :menu-props="{ maxHeight: 'auto' }" class="ma-0 mt-5" </v-combobox> -->
-
 
                 Wanneer was je er?
                 <v-container class="mb-0 mt-1" fluid>
