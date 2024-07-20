@@ -50,7 +50,7 @@
                     <!-- @update:model-value="handleSelectionUpdate" :custom-filter="customFilter"
                      -->
                 </v-sheet>
-                
+
                 <v-autocomplete clearable chips closable-chips v-model="selectedTags" :items="filteredTags" multiple
                     item-title="name" item-value="name" auto-select-first hide-no-data hide-selected small-chips
                     label="Voeg tags toe" append-icon="mdi-tag-plus" @blur="handleBlurOnTags"
@@ -234,10 +234,11 @@ const handleBlurOnTags = (event) => {
 
         tipTags.value.find(element => element === searchField.value) === undefined ? tipTags.value.push(searchField.value) : console.log('value already exists in tipTags')
         const tag = tipTags.value.find(element => element.name === searchField.value)
-        selectedTags.value.find(element => element === searchField.value) === undefined ? selectedTags.value.push( searchField.value ) : console.log('value already exists in model tags')
-        updateModelTags()
+        if (selectedTags.value && selectedTags.value.length > 0) {
+            selectedTags.value.find(element => element === searchField.value) === undefined ? selectedTags.value.push(searchField.value) : console.log('value already exists in model tags')
+            updateModelTags()
+        }
 
-        
         console.log('add tag ', searchField.value)
         searchTagsField.value = ''
         searchField.value = ''
@@ -269,24 +270,28 @@ onMounted(() => {
     if (!model.value.wanneer?.maand) { model.value.maand = model.value.maand }
     if (!model.value.wanneer?.jaar) { model.value.jaar = model.value.jaar }
     tipTags.value = [...appStore.tipTags]
-    selectedTags.value = model.value.tags.map((tag) => {
+    if (model.value.tags && model.value.tags.length > 0) {
+        selectedTags.value = model.value.tags.map((tag) => {
         return tag
     })
 
+        
+    }
 })
 
 const updateModelTags = () => {
-    const tags = selectedTags.value.map((tag) => {
-        console.log('tag in new Value', tag)
-        return tag
-    })
-    model.value.tags = tags
-    console.log('model tags updated', model.value.tags)
-
+    if (selectedTags.value && selectedTags.value.length > 0) {
+        const tags = selectedTags.value.map((tag) => {
+            console.log('tag in new Value', tag)
+            return tag
+        })
+        model.value.tags = tags
+        console.log('model tags updated', model.value.tags)
+    }
 }
 
 watch(selectedTags, async (newTags, oldTags) => {
-updateModelTags()
+    updateModelTags()
 })
 
 
