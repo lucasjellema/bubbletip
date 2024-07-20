@@ -2,10 +2,24 @@
     <div>
         <div id="mapWithMarkers" style="height: 500px;"></div>
     </div>
+        <!-- contents for the popup on markers; note: this content is moved to the leaflet popup by referencing the $el under the popupContentRef -->
+        <div style="display: none;">
+      <v-card class="mx-auto hover-zoom" max-width="600" :title="poppedupTip?.naam"
+        theme="light" ref="popupContentRef">
+        <v-btn @click="emit('tipSelected', poppedupTip)" text>Details</v-btn>
+      </v-card>
+    </div>
+
 </template>
 <script setup>
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
+
+import { useIconsLibrary } from '@/composables/useIconsLibrary';
+const { tipTypeIconMap } = useIconsLibrary();
+
+const popupContentRef = ref(null)
+const poppedupTip = ref(null)
 const emit = defineEmits(['boxed', 'tipSelected']);
 const props = defineProps({
     tips: {
@@ -49,6 +63,19 @@ const drawMarkers = (tips) => {
             draggable: true
         }).addTo(map).bindPopup(tip.naam)
         markers.push(marker)
+
+        if (tips.length < 30) {
+            const includeName = tips.length < 5
+            const tooltipContent = `<p class="${tipTypeIconMap[tip.tipType]} mdi "> ${includeName ? tip.naam : ''}</p>`
+            const tooltip = marker.bindTooltip(tooltipContent)
+            tooltip.openTooltip()
+        }
+        marker.bindPopup((marker) => {
+            poppedupTip.value = tip
+            return popupContentRef.value.$el
+        })
+
+
     }
     // zoom map such that all markers are visible
     if (markers.length > 0) {
@@ -58,7 +85,7 @@ const drawMarkers = (tips) => {
 
 const initMap = () => {
     // Initialize the map
-    map = L.map('mapWithMarkers').setView([50, 6], 13);
+    map = L.map('mapWithMarkers').setView([52.05, 4.49], 13);
 
     // Set up the OSM layer
     const osmLayer = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {

@@ -4,7 +4,7 @@
     <v-row>
       <v-col>
         <v-text-field label="Zoeken..." v-model="search"></v-text-field>
-        <MapMarkersComponent :tips="filteredTips" :adjust="adjust" @boxed="handleBoxed"></MapMarkersComponent>
+        <MapMarkersComponent :tips="filteredTips" :adjust="adjust" @boxed="handleBoxed" @tipSelected="handleTipSelected"></MapMarkersComponent>
       </v-col>
       <v-col>
         <v-card-text>
@@ -99,6 +99,11 @@ const selectedTip = computed(() =>
 
 const adjust = ref(0)
 
+const handleTipSelected = (tip) => {
+  console.log('tip selected', tip)
+  tipId.value = tip.id
+  tipDialog.value = true
+}
 
 const tipHeaders = ref([
   { title: 'Type', key: 'tipType' },

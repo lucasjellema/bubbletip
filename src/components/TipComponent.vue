@@ -71,17 +71,14 @@ import '@vueup/vue-quill/dist/vue-quill.snow.css';
 import ErrorBoundary from '@/components/ErrorBoundary.vue';
 import { useDateLibrary } from '@/composables/useDateLibrary';
 const { formatDate, months } = useDateLibrary();
+import { useIconsLibrary } from '@/composables/useIconsLibrary';
+const { tipTypeIconMap } = useIconsLibrary();
 
 import { useAppStore } from "@/stores/app";
 const appStore = useAppStore()
 
 const model = defineModel()
 
-const tipTypeIconMap = {
-    verblijf: 'mdi-bed',
-    restaurant: 'mdi-silverware-fork-knife',
-    activiteit: 'mdi-walk'
-}
 
 const imageHeaders = [
     {
