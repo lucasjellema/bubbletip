@@ -40,9 +40,7 @@
             <!-- <v-btn @click="gotoItem(item)" text>Details</v-btn> -->
             <v-btn @click="() => { tipId = item.id; tipDialog = true }" text>Details</v-btn>
 
-            <v-icon>
-              {{ item.tipType === 'verblijf' ? 'mdi-bed' : (item.tipType === 'restaurant' ? 'mdi-silverware-fork-knife'
-                : 'mdi-walk') }}
+            <v-icon>{{tipTypeIconMap[item.tipType]}}
             </v-icon>
           </template>
           <template v-slot:item.plek="{ item, index }">
@@ -86,8 +84,13 @@ const filterTags = ref([])
 const filterTipTypes = ref([])
 const filterCountries = ref([])
 import { useDateLibrary } from '@/composables/useDateLibrary';
-import MapMarkersComponent from "@/components/MapMarkersComponent .vue";
 const { formatDate } = useDateLibrary();
+
+import { useIconsLibrary } from '@/composables/useIconsLibrary';
+const { tipTypeIconMap } = useIconsLibrary();
+
+import MapMarkersComponent from "@/components/MapMarkersComponent .vue";
+
 const countries = ref([])
 
 const tipDialog = ref(false)
