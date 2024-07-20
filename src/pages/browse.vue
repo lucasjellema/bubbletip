@@ -3,7 +3,7 @@
   <v-container>
     <v-row>
       <v-col>
-        <v-text-field label="Zoeken..." v-model="search"></v-text-field>
+        <v-text-field label="Zoeken..." v-model="search" hint="Zoek naar tips op basis van naam, tags, plaats, adres"></v-text-field>
         <MapMarkersComponent :tips="filteredTips" :adjust="adjust" @boxed="handleBoxed" @tipSelected="handleTipSelected"></MapMarkersComponent>
       </v-col>
       <v-col>
@@ -124,7 +124,12 @@ const geobounds = ref(null)
 const filter = () => {
   filteredTips.value = tips.value
   if (search.value !== '') {
-    filteredTips.value = filteredTips.value.filter((tip) => tip.naam.toLowerCase().includes(search.value.toLowerCase()))
+    filteredTips.value = filteredTips.value.filter((tip) => 
+       tip.naam?.toLowerCase().includes(search.value.toLowerCase())
+      ||tip.plaats?.toLowerCase().includes(search.value.toLowerCase())
+      ||tip.adresgegevens?.toLowerCase().includes(search.value.toLowerCase())
+      ||tip.tags.find(t => t.toLowerCase().includes(search.value.toLowerCase()))
+      )
   }
   if (filterTags.value.length > 0) {
     const t = Array.from(filterTags.value)
