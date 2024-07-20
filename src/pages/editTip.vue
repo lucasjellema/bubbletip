@@ -1,5 +1,6 @@
 <template>
     <h1>Tip Bewerken</h1>   
+    <v-btn title="Sla tip op" class="mb-2" @click="saveTip()">Sla Tip Op</v-btn>
     <EditTipComponent v-model="tip" v-if="tip"/>
     <v-btn title="Sla tip op" class="mb-2" @click="saveTip()">Sla Tip Op</v-btn>
 </template>
