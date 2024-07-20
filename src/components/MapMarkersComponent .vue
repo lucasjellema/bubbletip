@@ -2,12 +2,18 @@
     <div>
         <div id="mapWithMarkers" style="height: 500px;"></div>
     </div>
-        <!-- contents for the popup on markers; note: this content is moved to the leaflet popup by referencing the $el under the popupContentRef -->
-        <div style="display: none;">
-      <v-card class="mx-auto hover-zoom" max-width="600" :title="poppedupTip?.naam"
-        theme="light" ref="popupContentRef">
-        <v-btn @click="emit('tipSelected', poppedupTip)" text>Details</v-btn>
-      </v-card>
+    <!-- contents for the popup on markers; note: this content is moved to the leaflet popup by referencing the $el under the popupContentRef -->
+    <div style="display: none;">
+        <v-sheet :height="80" :width="200" ref="popupContentRef">
+            <div v-if="poppedupTip">
+                <p>
+                    <v-icon>{{ tipTypeIconMap[poppedupTip.tipType] }}</v-icon>
+                    {{ poppedupTip.naam }}
+                    <i>Getipt door {{ poppedupTip.tipGever }} op {{ formatDate(poppedupTip.aanmaakdatum) }} </i>
+                </p>
+                <v-btn @click="emit('tipSelected', poppedupTip)" text  size="x-small" class="" slim variant="elevated">Details</v-btn>
+            </div>
+        </v-sheet>
     </div>
 
 </template>
@@ -17,6 +23,8 @@ import 'leaflet/dist/leaflet.css';
 
 import { useIconsLibrary } from '@/composables/useIconsLibrary';
 const { tipTypeIconMap } = useIconsLibrary();
+import { useDateLibrary } from '@/composables/useDateLibrary';
+const { formatDate, months } = useDateLibrary();
 
 const popupContentRef = ref(null)
 const poppedupTip = ref(null)
