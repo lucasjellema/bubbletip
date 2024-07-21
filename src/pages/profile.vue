@@ -8,7 +8,9 @@
         <v-text-field label="Geboortedatum" type="date" v-model="geboortedatum" </v-text-field>
           <v-textarea label="Introductie" prepend-icon="mdi-text-account" v-model="introductie"
             hint="introductie"></v-textarea>
-          <v-btn title="Sla gegevens op" class="mb-2" @click="saveLid()" v-if="appStore.ingechecktLid?.gebruikersnaam==gebruikersnaam">Opslaan</v-btn>
+            <v-btn title="Sla gegevens op" class="mb-2" @click="saveLid()" v-if="appStore.ingechecktLid?.gebruikersnaam==gebruikersnaam">Opslaan</v-btn>
+            <v-btn title="Consolideer Deltafiles" class="ml-5 mb-2" v-if="appStore.ingechecktLid?.gebruikersnaam=='lucas'" @click="consolideerDeltafiles()" >Consolideer Deltafiles</v-btn>
+          
       </v-col>
     </v-row>
   </v-container>
@@ -33,5 +35,10 @@ const introductie = ref(lid.introductie)
 
 const saveLid = () => {
   appStore.saveLid(gebruikersnaam, voornaam.value, achternaam.value, geboortedatum.value, introductie.value)
+}
+
+const consolideerDeltafiles= () => {
+  console.log("consolideerDeltafiles")
+  appStore.consolideerDeltafiles()
 }
 </script>
