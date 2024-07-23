@@ -1,5 +1,4 @@
 <template>
-
     <v-autocomplete clearable chips closable-chips v-model="selectedTags" :items="filteredTags" multiple
         item-title="name" item-value="name" auto-select-first hide-no-data hide-selected small-chips
         label="Voeg tags toe" append-icon="mdi-tag-plus" @blur="handleBlurOnTags" :custom-filter="customFilter"
@@ -11,40 +10,35 @@
         <template v-slot:item="{ props, item }">
             <v-chip v-bind="props" :text="item.raw.name" class="chippie"></v-chip>
         </template>
-
     </v-autocomplete>
 </template>
 
 <script setup>
 import { watch } from 'vue';
 
-
-
-
-
 const props = defineProps({
-    tags: {
+    tags: { // the collection of strings the user can select from
         type: Array
     },
-    theTags: {
+    theTags: { // the collection of strings already selected
         type: Array
     }
 
 })
-const tipTags = ref([])
-const emit = defineEmits(['tagSelectionChanged'])
+
+const emit = defineEmits(['tagSelectionChanged']) // the event to indicate that the selection of tags has changed; the payload of the event is the collection of selected tags
 
 const selectedTags = ref([])
 
-watch(() => props.theTags, (newValue, oldValue) => {
-    console.log(`theTags changed `, newValue)
+watch(() => props.theTags, (newValue, oldValue) => { // handle changes in the set of selected tags
     if (newValue !=selectedTags.value) {
-        selectedTags.value = props.theTags
-        
+        selectedTags.value = props.theTags        
     }
 })
 
-const tagsAdded = ref([])
+// TODO watch props.tags for changes - update the set of tags available for selection  
+
+const tagsAdded = ref([]) // tags defined by the user inside this component
 const filteredTags = computed(() => {
     const tagArray = Array.from(props.tags).concat(tagsAdded.value)
     const tags = tagArray.map((tag) => {
@@ -53,7 +47,6 @@ const filteredTags = computed(() => {
     return tags
 })
 
-
 const searchTagsField = ref('')
 const searchField = ref('')
 const autocompleteRef = ref(null)
@@ -61,26 +54,14 @@ const autocompleteRef = ref(null)
 const handleBlurOnTags = (event) => {
     console.log('blur, current search value on tags ', searchField.value)
     if (searchField.value !== '' && !elementAdded) {
-
         filteredTags.value.find(element => element === searchField.value) === undefined ? tagsAdded.value.push(searchField.value) : console.log('value already exists in filtered Tags')
-        const tag = tipTags.value.find(element => element.name === searchField.value)
-        // if (model.value && model.value.length > 0) {
-        //     const selectedTag = model.value.find(element => element === searchField.value)
-        //     if (selectedTag === undefined) { 
-        //         model.value.push(searchField.value)
-        //         emit('tagSelectionChanged', model.value)
-        //     }
             if (selectedTags.value && selectedTags.value.length > 0) {
             const selectedTag = selectedTags.value.find(element => element === searchField.value)
             if (selectedTag === undefined) { 
                 selectedTags.value.push(searchField.value)
                 emit('tagSelectionChanged', selectedTags.value)
             }
-            // : console.log('value already exists in model tags')
-           // updateModelTags()
         }
-
-        console.log('add tag ', searchField.value)
         searchTagsField.value = ''
         searchField.value = ''
         autocompleteRef.value.search = ''
@@ -89,10 +70,9 @@ const handleBlurOnTags = (event) => {
 
 }
 const customFilter = (itemTitle, queryText, item) => {
-    //  console.log('custom filter ', itemTitle, queryText, item)
     elementAdded = false
+    // Add any custom logic for determining if an item should be included based on the queryText entered by the user
     const textOne = item.raw.name.toLowerCase()
-    // const textTwo = item.raw.abbr.toLowerCase()
     const searchText = queryText.toLowerCase()
     searchField.value = queryText
     return queryText.length > -1 && textOne.indexOf(searchText) > -1
@@ -104,18 +84,9 @@ const handleSelectionUpdate = (event) => {
     elementAdded = true
 }
 
-// watch(() => model.tags
-// , async (newTags, oldTags) => {
-// console.log('model tags changed', newTags, oldTags)
-// selectedTags.value = newTags.map((tag) => {
-//             return tag
-//         })
-// })
 onMounted(() => {
    selectedTags.value = props.theTags
 })
-
-
 
 
 </script>
