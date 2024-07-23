@@ -44,29 +44,21 @@
                 <p>Beschrijving (van hotel, restaurant, museum, attractie: wat is het? waarom is het leuk? hoe kom je
                     er?
                     wat kost het?)</p>
+
+
+
                 <v-sheet class="flex-1-1-100  ma-0 pa-0 mb-3">
                     <v-textarea v-model="model.beschrijving" variant="outlined" rows="4"></v-textarea>
                     <!-- <QuillEditor theme="snow" toolbar="essential" v-model:content="model.beschrijving" contentType="delta" /> -->
-                    <!-- @update:model-value="handleSelectionUpdate" :custom-filter="customFilter"
-                     -->
+
                 </v-sheet>
 
-                <v-autocomplete clearable chips closable-chips v-model="selectedTags" :items="filteredTags" multiple
-                    item-title="name" item-value="name" auto-select-first hide-no-data hide-selected small-chips
-                    label="Voeg tags toe" append-icon="mdi-tag-plus" @blur="handleBlurOnTags"
-                    :custom-filter="customFilter" @update:model-value="handleSelectionUpdate" clear-on-select
-                    ref="autocompleteRef" class="ma-0 mt-5">
-                    <!-- selected items -->
-                    <template v-slot:chip="{ props, item }">
-                        <v-chip v-bind="props" :text="item.raw.name"></v-chip>
-                    </template> <!-- to select -->
-                    <template v-slot:item="{ props, item }">
-                        <v-chip v-bind="props" :text="item.raw.name" class="chippie"></v-chip>
-                    </template>
 
-                </v-autocomplete>
 
                 Wanneer was je er?
+                <TagComponent :tags="mytags" :theTags="myselectedTags" @tagSelectionChanged="handleTagSelectionChanged">
+                </TagComponent>
+
                 <v-container class="mb-0 mt-1" fluid>
                     <v-row>
                         <v-col cols="7">
@@ -210,57 +202,18 @@ const { reverseGeocode, extractEXIFData, isValidCoordinateFormat } = useGeoLibra
 import { useAppStore } from "@/stores/app";
 
 const appStore = useAppStore()
-const bubble = appStore.getBubble()
+
 const model = defineModel()
-const tipTags = ref([])
+// const tipTags = ref([])
+
+const mytags = ref([])
+const myselectedTags = ref([])
+
+const handleTagSelectionChanged = (e) => {
+    model.value.tags = [...e]
+}
 
 const selectedTags = ref([])
-const filteredTags = computed(() => {
-    const tagArray = Array.from(tipTags.value)
-    const tags = tagArray.map((tag) => {
-        return { name: tag }
-    })
-    return tags
-})
-
-
-const searchTagsField = ref('')
-const searchField = ref('')
-const autocompleteRef = ref(null)
-
-const handleBlurOnTags = (event) => {
-    console.log('blur, current search value on tags ', searchField.value)
-    if (searchField.value !== '' && !elementAdded) {
-
-        tipTags.value.find(element => element === searchField.value) === undefined ? tipTags.value.push(searchField.value) : console.log('value already exists in tipTags')
-        const tag = tipTags.value.find(element => element.name === searchField.value)
-        if (selectedTags.value && selectedTags.value.length > 0) {
-            selectedTags.value.find(element => element === searchField.value) === undefined ? selectedTags.value.push(searchField.value) : console.log('value already exists in model tags')
-            updateModelTags()
-        }
-
-        console.log('add tag ', searchField.value)
-        searchTagsField.value = ''
-        searchField.value = ''
-        autocompleteRef.value.search = ''
-    }
-    elementAdded = false
-
-}
-const customFilter = (itemTitle, queryText, item) => {
-    //  console.log('custom filter ', itemTitle, queryText, item)
-    elementAdded = false
-    const textOne = item.raw.name.toLowerCase()
-    // const textTwo = item.raw.abbr.toLowerCase()
-    const searchText = queryText.toLowerCase()
-    searchField.value = queryText
-    return queryText.length > -1 && textOne.indexOf(searchText) > -1
-}
-
-let elementAdded = false
-const handleSelectionUpdate = (event) => {
-    elementAdded = true
-}
 
 
 onMounted(() => {
@@ -269,39 +222,13 @@ onMounted(() => {
     if (!model.value.jaar) { model.value.jaar = model.value.wanneer?.jaar }
     if (!model.value.wanneer?.maand) { model.value.maand = model.value.maand }
     if (!model.value.wanneer?.jaar) { model.value.jaar = model.value.jaar }
-    tipTags.value = [...appStore.tipTags]
+    mytags.value = [...appStore.tipTags]
     if (model.value.tags && model.value.tags.length > 0) {
-        selectedTags.value = model.value.tags.map((tag) => {
-        return tag
-    })
-
-        
+        myselectedTags.value = [...model.value.tags]
     }
 })
 
-const updateModelTags = () => {
-    if (selectedTags.value && selectedTags.value.length > 0) {
-        const tags = selectedTags.value.map((tag) => {
-            console.log('tag in new Value', tag)
-            return tag
-        })
-        model.value.tags = tags
-        console.log('model tags updated', model.value.tags)
-    }
-}
 
-watch(selectedTags, async (newTags, oldTags) => {
-    updateModelTags()
-})
-
-
-const handleTagChange = (newValue) => {
-    // Handle the change event
-    // This is where you might want to add logic to update the list of tags
-    // For example, you could add the newly entered tag to `availableTags`
-    // if it doesn't already exist, assuming you want to save it for future suggestions.
-    console.log('Tags updated:', newValue);
-}
 
 
 const imageURL = ref('')
@@ -443,10 +370,3 @@ const defineTipCoordinatesFromEXIFGPS = (item) => {
 
 
 </script>
-<style scoped>
-.chippie {
-    flex: 1 0 auto;
-    margin: 4px;
-    background-color: yellow
-}
-</style>
