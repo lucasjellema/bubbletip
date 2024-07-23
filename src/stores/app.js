@@ -311,7 +311,7 @@ export const useAppStore = defineStore('app', () => {
 
     // write lastDeltaConsolidated.json with fileid/timestamp of most recent delta that was processed
     const lastDeltaFileProcessed = deltaFiles[deltaFiles.length - 1]
-    const timestamp = lastDeltaFileProcessed.name.substring(0, lastDeltaFileProcessed.name.length - 5).substring(13)
+    const timestamp = lastDeltaFileProcessed.name.substring(0, lastDeltaFileProcessed.name.length - 5).substring(DELTA_DIRECTORY.length+1) // strip .json at the end and strip delta/ at the beginning
     const lastConsolidation = { consolidationTimestamp: new Date().getTime(), lastDeltaTimestamp: timestamp }
     bubbleJSON.value.lastConsolidation = lastConsolidation
     const _ = await saveFile(JSON.stringify(bubbleJSON.value), MAIN_BUBBLE_FILE)
